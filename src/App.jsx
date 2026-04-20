@@ -1226,9 +1226,18 @@ export default function App() {
           <aside className="panel cart-panel" id="contacto">
             <div className="panel__header">
               <div>
-                <p className="eyebrow">Checkout</p>
+                <p className="eyebrow">Pedido</p>
                 <h2>Tu pedido</h2>
               </div>
+              <span className="checkout-status">
+                {cart.length === 0 ? "Sin productos" : `${cartTotalQuantity} items`}
+              </span>
+            </div>
+
+            <div className="checkout-steps">
+              <span>1. Elegi</span>
+              <span>2. Completa</span>
+              <span>3. Confirmamos</span>
             </div>
 
             {cart.length === 0 ? (
@@ -1243,7 +1252,9 @@ export default function App() {
                     <article className="cart-item" key={item.id}>
                       <div>
                         <h3>{item.name}</h3>
-                        <p>{formatPrice(item.price)}</p>
+                        <p>
+                          {formatPrice(item.price)} x {item.quantity}
+                        </p>
                       </div>
 
                       <div className="cart-item__controls">
@@ -1283,6 +1294,11 @@ export default function App() {
             )}
 
             <div className="form-card">
+              <div className="checkout-intro">
+                <strong>Datos para coordinar</strong>
+                <p>Te contactamos por WhatsApp para confirmar retiro o envio.</p>
+              </div>
+
               <div className="field-group">
                 <label htmlFor="customerName">Nombre</label>
                 <input
@@ -1353,6 +1369,13 @@ export default function App() {
               {checkoutErrors.cart ? <p className="field-error">{checkoutErrors.cart}</p> : null}
               {orderError ? <p className="feedback feedback--error">{orderError}</p> : null}
               {orderMessage ? <p className="feedback feedback--success">{orderMessage}</p> : null}
+
+              {cart.length > 0 ? (
+                <div className="mobile-checkout-summary">
+                  <span>Total del pedido</span>
+                  <strong>{formatPrice(cartTotalAmount)}</strong>
+                </div>
+              ) : null}
 
               <button
                 type="button"

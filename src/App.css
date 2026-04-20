@@ -884,6 +884,63 @@ img {
   gap: 16px;
 }
 
+.checkout-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(106, 70, 47, 0.1);
+  color: #624536;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.checkout-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  overflow: hidden;
+  border: 1px solid rgba(106, 70, 47, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 253, 249, 0.72);
+}
+
+.checkout-steps span {
+  padding: 11px 8px;
+  border-right: 1px solid rgba(106, 70, 47, 0.1);
+  color: #765744;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.checkout-steps span:last-child {
+  border-right: 0;
+}
+
+.checkout-intro {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(244, 238, 231, 0.72);
+}
+
+.checkout-intro strong {
+  color: #3a261c;
+}
+
+.checkout-intro p {
+  margin: 0;
+  color: #765744;
+  line-height: 1.45;
+}
+
+.mobile-checkout-summary {
+  display: none;
+}
+
 .cart-items,
 .order-items {
   display: grid;
@@ -1459,6 +1516,61 @@ img {
 
   .panel__hint {
     text-align: left;
+  }
+
+  .cart-panel {
+    gap: 14px;
+  }
+
+  .checkout-status {
+    justify-self: start;
+  }
+
+  .checkout-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-steps span {
+    border-right: 0;
+    border-bottom: 1px solid rgba(106, 70, 47, 0.1);
+  }
+
+  .checkout-steps span:last-child {
+    border-bottom: 0;
+  }
+
+  .cart-item {
+    display: grid;
+    gap: 12px;
+  }
+
+  .summary-card {
+    display: none;
+  }
+
+  .mobile-checkout-summary {
+    position: sticky;
+    bottom: 10px;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 14px;
+    border: 1px solid rgba(106, 70, 47, 0.16);
+    border-radius: 18px;
+    background: rgba(255, 248, 240, 0.96);
+    box-shadow: 0 12px 30px rgba(83, 48, 30, 0.14);
+  }
+
+  .mobile-checkout-summary span {
+    color: #765744;
+    font-weight: 800;
+  }
+
+  .mobile-checkout-summary strong {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.15rem;
   }
 
   .view-switcher {
