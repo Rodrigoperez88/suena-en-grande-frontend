@@ -740,6 +740,17 @@ export default function App() {
   const productCategories = [
     ...new Set(products.map((product) => product.category).filter(Boolean)),
   ].slice(0, 5);
+  const productsByCategory = products.reduce((groups, product) => {
+    const category = product.category?.trim() || "Sin categoria";
+
+    if (!groups[category]) {
+      groups[category] = [];
+    }
+
+    groups[category].push(product);
+    return groups;
+  }, {});
+  const categorySections = Object.entries(productsByCategory);
 
   return (
     <div className="page-shell">
@@ -910,60 +921,74 @@ export default function App() {
                 <p>Usa el panel admin para crear el catalogo inicial.</p>
               </div>
             ) : (
-              <div className="product-grid">
-                {products.map((product) => {
-                  const cartItem = cart.find((item) => item.id === product.id);
-                  const remainingStock = product.stock - (cartItem?.quantity || 0);
-                  const hasStock = remainingStock > 0;
-
-                  return (
-                    <article className="product-card" key={product.id}>
-                      <div className="product-card__media">
-                        <span className="product-card__badge">
-                          {hasStock ? "Envio coordinado" : "Sin stock"}
-                        </span>
-                        {product.image ? (
-                          <img src={product.image} alt={product.name} />
-                        ) : (
-                          <span>{product.category || "Producto"}</span>
-                        )}
+              <div className="category-sections">
+                {categorySections.map(([category, categoryProducts]) => (
+                  <section className="category-section" key={category}>
+                    <div className="category-section__header">
+                      <div>
+                        <p className="eyebrow eyebrow--compact">Categoria</p>
+                        <h3>{category}</h3>
                       </div>
+                      <span>{categoryProducts.length} productos</span>
+                    </div>
 
-                      <div className="product-card__body">
-                        <p className="eyebrow eyebrow--compact">
-                          {product.category || "Sin categoria"}
-                        </p>
-                        <h3>{product.name}</h3>
-                        <p className="product-card__description">
-                          {product.description ||
-                            "Producto ideal para sumar aroma, armonia y calidez al hogar."}
-                        </p>
+                    <div className="product-grid">
+                      {categoryProducts.map((product) => {
+                        const cartItem = cart.find((item) => item.id === product.id);
+                        const remainingStock = product.stock - (cartItem?.quantity || 0);
+                        const hasStock = remainingStock > 0;
 
-                        <div className="product-card__meta">
-                          <strong>{formatPrice(product.price)}</strong>
-                          <span
-                            className={
-                              hasStock
-                                ? "stock-pill stock-pill--available"
-                                : "stock-pill stock-pill--empty"
-                            }
-                          >
-                            {hasStock ? "En stock" : "Sin stock"}
-                          </span>
-                        </div>
+                        return (
+                          <article className="product-card" key={product.id}>
+                            <div className="product-card__media">
+                              <span className="product-card__badge">
+                                {hasStock ? "Envio coordinado" : "Sin stock"}
+                              </span>
+                              {product.image ? (
+                                <img src={product.image} alt={product.name} />
+                              ) : (
+                                <span>{product.category || "Producto"}</span>
+                              )}
+                            </div>
 
-                        <button
-                          type="button"
-                          className="primary-btn"
-                          onClick={() => addToCart(product)}
-                          disabled={!hasStock}
-                        >
-                          {hasStock ? "Agregar al carrito" : "Sin stock"}
-                        </button>
-                      </div>
-                    </article>
-                  );
-                })}
+                            <div className="product-card__body">
+                              <p className="eyebrow eyebrow--compact">
+                                {product.category || "Sin categoria"}
+                              </p>
+                              <h3>{product.name}</h3>
+                              <p className="product-card__description">
+                                {product.description ||
+                                  "Producto ideal para sumar aroma, armonia y calidez al hogar."}
+                              </p>
+
+                              <div className="product-card__meta">
+                                <strong>{formatPrice(product.price)}</strong>
+                                <span
+                                  className={
+                                    hasStock
+                                      ? "stock-pill stock-pill--available"
+                                      : "stock-pill stock-pill--empty"
+                                  }
+                                >
+                                  {hasStock ? "En stock" : "Sin stock"}
+                                </span>
+                              </div>
+
+                              <button
+                                type="button"
+                                className="primary-btn"
+                                onClick={() => addToCart(product)}
+                                disabled={!hasStock}
+                              >
+                                {hasStock ? "Agregar al carrito" : "Sin stock"}
+                              </button>
+                            </div>
+                          </article>
+                        );
+                      })}
+                    </div>
+                  </section>
+                ))}
               </div>
             )}
           </section>
