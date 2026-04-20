@@ -743,19 +743,61 @@ export default function App() {
 
   return (
     <div className="page-shell">
-      <header className="hero">
-        <div className="hero__copy">
-          <p className="eyebrow">Bienestar, hogar y pequenos rituales</p>
+      <div className="top-strip">
+        <span>Envios y retiros coordinados</span>
+        <span>Compra segura por pedido directo</span>
+        <span>Atencion personalizada por WhatsApp</span>
+      </div>
+
+      <div className="store-header">
+        <div className="store-header__brand">
           <SignedOut>
             <SignInButton mode="modal">
-              <button type="button" className="brand-login">
-                Suena en Grande
+              <button type="button" className="brand-login brand-login--header">
+                Sueña en Grande
               </button>
             </SignInButton>
           </SignedOut>
           <SignedIn>
-            <h1>Suena en Grande</h1>
+            <button
+              type="button"
+              className="brand-login brand-login--header"
+              onClick={() => setActiveView("shop")}
+            >
+              Sueña en Grande
+            </button>
           </SignedIn>
+        </div>
+
+        <nav className="store-header__nav" aria-label="Navegacion principal">
+          <button type="button" onClick={() => setActiveView("shop")}>
+            Inicio
+          </button>
+          <button type="button" onClick={() => setActiveView("shop")}>
+            Productos
+          </button>
+          <button type="button" onClick={() => setActiveView("shop")}>
+            Contacto
+          </button>
+          {isAdminUser ? (
+            <button type="button" onClick={() => setActiveView("admin")}>
+              Admin
+            </button>
+          ) : null}
+        </nav>
+
+        <div className="store-header__actions">
+          {isAdminUser ? <UserButton /> : null}
+          <button type="button" className="cart-chip" onClick={() => setActiveView("shop")}>
+            Carrito <strong>{cartTotalQuantity}</strong>
+          </button>
+        </div>
+      </div>
+
+      <header className="hero">
+        <div className="hero__copy">
+          <p className="eyebrow">Bienestar, hogar y pequenos rituales</p>
+          <h1>Aromas y deco para crear espacios con calma</h1>
           <p className="hero__text">
             Aromas, texturas y objetos elegidos para transformar tu casa en un
             refugio calido. Compra simple, atencion cercana y productos con alma.
@@ -790,32 +832,26 @@ export default function App() {
         </div>
 
         <div className="hero__aside">
-          {isAdminUser ? (
-            <div className="user-card">
-              <span>Admin</span>
-              <UserButton />
-            </div>
-          ) : null}
           <div className="badge-card">
-            <span>Carrito</span>
-            <strong>{cartTotalQuantity}</strong>
+            <span>Catalogo</span>
+            <strong>{products.length}</strong>
           </div>
           <div className="badge-card badge-card--soft">
-            <span>Pedidos</span>
-            <strong>{orders.length}</strong>
+            <span>Pedido</span>
+            <strong>{cartTotalQuantity}</strong>
           </div>
         </div>
       </header>
 
-      <nav className="view-switcher">
-        <button
-          type="button"
-          className={activeView === "shop" ? "view-switcher__btn is-active" : "view-switcher__btn"}
-          onClick={() => setActiveView("shop")}
-        >
-          Tienda
-        </button>
-        {isAdminUser ? (
+      {isAdminUser ? (
+        <nav className="view-switcher">
+          <button
+            type="button"
+            className={activeView === "shop" ? "view-switcher__btn is-active" : "view-switcher__btn"}
+            onClick={() => setActiveView("shop")}
+          >
+            Tienda
+          </button>
           <button
             type="button"
             className={activeView === "admin" ? "view-switcher__btn is-active" : "view-switcher__btn"}
@@ -823,8 +859,8 @@ export default function App() {
           >
             Admin
           </button>
-        ) : null}
-      </nav>
+        </nav>
+      ) : null}
 
       {loading ? <p className="panel-message">Cargando tienda...</p> : null}
       {error ? <p className="panel-message panel-message--error">{error}</p> : null}
