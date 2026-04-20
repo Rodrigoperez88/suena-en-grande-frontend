@@ -622,12 +622,12 @@ export default function App() {
         </div>
 
         <div className="hero__aside">
-          <SignedIn>
+          {isAdminUser ? (
             <div className="user-card">
               <span>Admin</span>
               <UserButton />
             </div>
-          </SignedIn>
+          ) : null}
           <div className="badge-card">
             <span>Carrito</span>
             <strong>{cartTotalQuantity}</strong>
