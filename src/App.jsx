@@ -461,7 +461,6 @@ export default function App() {
       const formData = new FormData();
       formData.append("file", optimizedFile);
       formData.append("upload_preset", cloudinaryUploadPreset);
-      formData.append("folder", "suena-en-grande/productos");
 
       const response = await fetch(
         `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/image/upload`,
@@ -481,7 +480,16 @@ export default function App() {
         ...prev,
         image: data.secure_url,
       }));
-      setAdminMessage("Imagen subida correctamente a Cloudinary.");
+
+      if (productForm.id) {
+        await axios.patch(`${apiUrl}/admin/productos/${productForm.id}`, {
+          image: data.secure_url,
+        });
+        await loadAdminData();
+        setAdminMessage("Imagen subida y guardada en el producto.");
+      } else {
+        setAdminMessage("Imagen subida. Completa el producto y guardalo.");
+      }
     } catch (err) {
       console.error("Error al subir imagen a Cloudinary:", err);
       setAdminError(err.message || "No se pudo subir la imagen.");
