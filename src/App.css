@@ -280,6 +280,7 @@ img {
 }
 
 .product-grid,
+.metrics-grid,
 .orders-list,
 .admin-products {
   display: grid;
@@ -290,7 +291,13 @@ img {
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
 }
 
+.metrics-grid {
+  grid-template-columns: repeat(4, minmax(140px, 1fr));
+  margin-bottom: 18px;
+}
+
 .product-card,
+.metric-card,
 .cart-item,
 .order-card,
 .admin-product-card,
@@ -363,12 +370,49 @@ img {
 }
 
 .cart-item,
+.metric-card,
 .summary-card,
 .form-card,
 .order-card,
 .admin-product-card,
 .empty-state {
   padding: 16px;
+}
+
+.metric-card {
+  background:
+    linear-gradient(145deg, rgba(255, 253, 250, 0.96), rgba(248, 235, 225, 0.82)),
+    #fffdfa;
+}
+
+.metric-card span {
+  display: block;
+  margin-bottom: 8px;
+  color: #9b7256;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.metric-card strong {
+  display: block;
+  margin-bottom: 6px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+}
+
+.metric-card p {
+  margin: 0;
+  color: #6c5649;
+  font-size: 0.9rem;
+}
+
+.metric-card--alert {
+  border-color: rgba(174, 67, 61, 0.24);
+  background:
+    linear-gradient(145deg, rgba(255, 247, 244, 0.96), rgba(250, 226, 218, 0.82)),
+    #fffdfa;
 }
 
 .cart-item__controls,
@@ -643,6 +687,10 @@ img {
   .admin-layout {
     grid-template-columns: 1fr;
   }
+
+  .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 720px) {
@@ -685,6 +733,10 @@ img {
   }
 
   .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics-grid {
     grid-template-columns: 1fr;
   }
 

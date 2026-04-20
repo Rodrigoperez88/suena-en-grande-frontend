@@ -82,6 +82,21 @@ export default function App() {
     isSignedIn &&
     adminEmails.length > 0 &&
     currentUserEmails.some((email) => adminEmails.includes(email));
+  const adminMetrics = useMemo(() => {
+    const pendingOrders = orders.filter((order) => order.status === "pendiente").length;
+    const deliveredOrders = orders.filter((order) => order.status === "entregado").length;
+    const totalSales = orders
+      .filter((order) => order.status !== "cancelado")
+      .reduce((acc, order) => acc + Number(order.total || 0), 0);
+    const lowStockProducts = products.filter((product) => Number(product.stock || 0) <= 3).length;
+
+    return {
+      pendingOrders,
+      deliveredOrders,
+      totalSales,
+      lowStockProducts,
+    };
+  }, [orders, products]);
 
   const getAdminRequestConfig = useCallback(async () => {
     const token = await getToken();
@@ -914,6 +929,29 @@ export default function App() {
             {adminLoading ? <p className="panel-message">Cargando panel admin...</p> : null}
             {adminError ? <p className="panel-message panel-message--error">{adminError}</p> : null}
             {adminMessage ? <p className="panel-message panel-message--success">{adminMessage}</p> : null}
+
+            <div className="metrics-grid">
+              <article className="metric-card">
+                <span>Pendientes</span>
+                <strong>{adminMetrics.pendingOrders}</strong>
+                <p>Pedidos esperando gestion</p>
+              </article>
+              <article className="metric-card">
+                <span>Ventas</span>
+                <strong>{formatPrice(adminMetrics.totalSales)}</strong>
+                <p>Total no cancelado</p>
+              </article>
+              <article className="metric-card">
+                <span>Entregados</span>
+                <strong>{adminMetrics.deliveredOrders}</strong>
+                <p>Pedidos completados</p>
+              </article>
+              <article className="metric-card metric-card--alert">
+                <span>Stock bajo</span>
+                <strong>{adminMetrics.lowStockProducts}</strong>
+                <p>Productos con 3 o menos</p>
+              </article>
+            </div>
 
             {!adminLoading && orders.length === 0 ? (
               <div className="empty-state">
