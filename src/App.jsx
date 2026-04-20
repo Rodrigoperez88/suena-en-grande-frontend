@@ -69,6 +69,8 @@ export default function App() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [statusSavingId, setStatusSavingId] = useState(null);
   const [deletingProductId, setDeletingProductId] = useState(null);
+  const [orderStatusFilter, setOrderStatusFilter] = useState("todos");
+  const [orderSearch, setOrderSearch] = useState("");
 
   const currencyFormatter = useMemo(() => {
     return new Intl.NumberFormat("es-AR", {
@@ -97,6 +99,39 @@ export default function App() {
       lowStockProducts,
     };
   }, [orders, products]);
+  const filteredOrders = useMemo(() => {
+    const normalizedSearch = orderSearch.trim().toLowerCase();
+
+    return orders
+      .filter((order) => {
+        const matchesStatus = orderStatusFilter === "todos" || order.status === orderStatusFilter;
+        const searchableText = [
+          order.id,
+          order.customerName,
+          order.customerPhone,
+          order.deliveryMethod,
+          order.address,
+          order.notes,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+        const matchesSearch = !normalizedSearch || searchableText.includes(normalizedSearch);
+
+        return matchesStatus && matchesSearch;
+      })
+      .sort((firstOrder, secondOrder) => {
+        if (firstOrder.status === "pendiente" && secondOrder.status !== "pendiente") {
+          return -1;
+        }
+
+        if (firstOrder.status !== "pendiente" && secondOrder.status === "pendiente") {
+          return 1;
+        }
+
+        return new Date(secondOrder.createdAt) - new Date(firstOrder.createdAt);
+      });
+  }, [orderSearch, orderStatusFilter, orders]);
 
   const getAdminRequestConfig = useCallback(async () => {
     const token = await getToken();
@@ -953,15 +988,57 @@ export default function App() {
               </article>
             </div>
 
+            <div className="orders-toolbar">
+              <div className="field-group">
+                <label htmlFor="orderSearch">Buscar pedido</label>
+                <input
+                  id="orderSearch"
+                  type="text"
+                  value={orderSearch}
+                  onChange={(event) => setOrderSearch(event.target.value)}
+                  placeholder="Cliente, telefono, direccion o numero"
+                />
+              </div>
+
+              <div className="field-group">
+                <label htmlFor="orderStatusFilter">Filtrar por estado</label>
+                <select
+                  id="orderStatusFilter"
+                  value={orderStatusFilter}
+                  onChange={(event) => setOrderStatusFilter(event.target.value)}
+                >
+                  <option value="todos">Todos los estados</option>
+                  {ORDER_STATUSES.map((statusOption) => (
+                    <option key={statusOption.value} value={statusOption.value}>
+                      {statusOption.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="orders-count">
+                <span>Resultados</span>
+                <strong>{filteredOrders.length}</strong>
+              </div>
+            </div>
+
             {!adminLoading && orders.length === 0 ? (
               <div className="empty-state">
                 <h3>No hay pedidos registrados</h3>
                 <p>Cuando lleguen compras apareceran aca con su detalle.</p>
               </div>
+            ) : !adminLoading && filteredOrders.length === 0 ? (
+              <div className="empty-state">
+                <h3>No encontramos pedidos</h3>
+                <p>Probá cambiar el estado seleccionado o limpiar la busqueda.</p>
+              </div>
             ) : (
               <div className="orders-list">
-                {orders.map((order) => (
-                  <article className="order-card" key={order.id}>
+                {filteredOrders.map((order) => (
+                  <article
+                    className={order.status === "pendiente" ? "order-card order-card--pending" : "order-card"}
+                    key={order.id}
+                  >
                     <div className="order-card__top">
                       <div>
                         <p className="eyebrow eyebrow--compact">Pedido #{order.id}</p>
