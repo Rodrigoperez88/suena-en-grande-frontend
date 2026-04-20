@@ -736,6 +736,8 @@ export default function App() {
     }
   };
 
+  const featuredHeroProduct = products.find((product) => product.image) || products[0];
+
   return (
     <div className="page-shell">
       <header className="hero">
@@ -752,10 +754,31 @@ export default function App() {
             <h1>Suena en Grande</h1>
           </SignedIn>
           <p className="hero__text">
-            Una tienda calida para vender productos con atmosfera, y ahora con un
-            panel interno simple para gestionar pedidos y catalogo.
+            Aromas, texturas y objetos elegidos para transformar tu casa en un
+            refugio calido. Compra simple, atencion cercana y productos con alma.
           </p>
+          <div className="hero__actions">
+            <button type="button" className="primary-btn" onClick={() => setActiveView("shop")}>
+              Ver catalogo
+            </button>
+            <span>Envios y retiros coordinados por WhatsApp</span>
+          </div>
           {apiMessage && <p className="hero__status">{apiMessage}</p>}
+        </div>
+
+        <div className="hero__visual" aria-label="Ambiente calido de la tienda">
+          {featuredHeroProduct?.image ? (
+            <img src={featuredHeroProduct.image} alt={featuredHeroProduct.name} />
+          ) : (
+            <div className="hero__visual-fallback">
+              <span>Sueña</span>
+              <strong>Rituales para el hogar</strong>
+            </div>
+          )}
+          <div className="hero__floating-card">
+            <span>Seleccion especial</span>
+            <strong>{featuredHeroProduct?.category || "Aromas y hogar"}</strong>
+          </div>
         </div>
 
         <div className="hero__aside">
@@ -804,11 +827,29 @@ export default function App() {
             <div className="panel__header">
               <div>
                 <p className="eyebrow">Catalogo</p>
-                <h2>Productos destacados</h2>
+                <h2>Rituales para regalar y habitar</h2>
               </div>
               <p className="panel__hint">
-                Agrega productos al carrito respetando el stock disponible.
+                Elegi tus favoritos y arma tu pedido en pocos pasos.
               </p>
+            </div>
+
+            <div className="ritual-grid">
+              <article>
+                <span>01</span>
+                <strong>Aromas que abrazan</strong>
+                <p>Sahumerios y perfumes para crear clima desde el primer momento.</p>
+              </article>
+              <article>
+                <span>02</span>
+                <strong>Calidez visual</strong>
+                <p>Objetos simples que suman luz, textura y presencia al hogar.</p>
+              </article>
+              <article>
+                <span>03</span>
+                <strong>Compra tranquila</strong>
+                <p>Pedido claro, stock visible y coordinacion directa para entregar.</p>
+              </article>
             </div>
 
             {products.length === 0 ? (
