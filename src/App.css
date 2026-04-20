@@ -145,9 +145,10 @@ img {
   border: 0;
   border-radius: 0;
   background:
-    linear-gradient(90deg, rgba(255, 248, 238, 0.96), rgba(255, 248, 238, 0.74) 48%, rgba(89, 58, 39, 0.1)),
-    radial-gradient(circle at 8% 22%, rgba(224, 165, 94, 0.24), transparent 32%),
-    #f4dfc7;
+    linear-gradient(90deg, rgba(255, 248, 238, 0.97), rgba(255, 248, 238, 0.8) 48%, rgba(89, 58, 39, 0.18)),
+    url("https://res.cloudinary.com/dfetskjy0/image/upload/v1776705932/HgDn10BVX_1256x620__1_nriyzo.jpg");
+  background-position: center;
+  background-size: cover;
   box-shadow: 0 16px 36px rgba(88, 58, 41, 0.08);
 }
 
