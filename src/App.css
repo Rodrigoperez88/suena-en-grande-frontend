@@ -32,6 +32,12 @@ img {
   width: 100%;
 }
 
+#inicio,
+#productos,
+#contacto {
+  scroll-margin-top: 120px;
+}
+
 .page-shell {
   min-height: 100vh;
   padding: 0 24px 24px;

@@ -263,6 +263,16 @@ export default function App() {
 
   const formatPrice = (value) => currencyFormatter.format(value || 0);
 
+  const scrollToSection = (sectionId) => {
+    setActiveView("shop");
+    window.requestAnimationFrame(() => {
+      document.getElementById(sectionId)?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  };
+
   const formatOrderDate = (dateValue) => {
     if (!dateValue) {
       return "Fecha no disponible";
@@ -963,13 +973,13 @@ export default function App() {
         </div>
 
         <nav className="store-header__nav" aria-label="Navegacion principal">
-          <button type="button" onClick={() => setActiveView("shop")}>
+          <button type="button" onClick={() => scrollToSection("inicio")}>
             Inicio
           </button>
-          <button type="button" onClick={() => setActiveView("shop")}>
+          <button type="button" onClick={() => scrollToSection("productos")}>
             Productos
           </button>
-          <button type="button" onClick={() => setActiveView("shop")}>
+          <button type="button" onClick={() => scrollToSection("contacto")}>
             Contacto
           </button>
           {isAdminUser ? (
@@ -987,7 +997,7 @@ export default function App() {
         </div>
       </div>
 
-      <header className="hero">
+      <header className="hero" id="inicio">
         <div className="hero__copy">
           <p className="eyebrow">Bienestar, hogar y pequenos rituales</p>
           <h1>Aromas y deco para crear espacios con calma</h1>
@@ -1060,7 +1070,7 @@ export default function App() {
 
       {!loading && !error && activeView === "shop" ? (
         <main className="shop-layout">
-          <section className="panel">
+          <section className="panel" id="productos">
             <div className="panel__header">
               <div>
                 <p className="eyebrow">Catalogo</p>
@@ -1213,7 +1223,7 @@ export default function App() {
             )}
           </section>
 
-          <aside className="panel cart-panel">
+          <aside className="panel cart-panel" id="contacto">
             <div className="panel__header">
               <div>
                 <p className="eyebrow">Checkout</p>
