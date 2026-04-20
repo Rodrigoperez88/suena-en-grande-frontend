@@ -358,6 +358,29 @@ img {
   font-size: 1.18rem;
 }
 
+.stock-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 11px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.stock-pill--available {
+  color: #2f6b45;
+  background: rgba(83, 158, 108, 0.14);
+}
+
+.stock-pill--empty {
+  color: #8a2f2d;
+  background: rgba(196, 76, 76, 0.12);
+}
+
 .cart-panel {
   display: grid;
   gap: 16px;

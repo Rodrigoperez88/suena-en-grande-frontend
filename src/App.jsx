@@ -268,16 +268,59 @@ export default function App() {
     ].join("\n");
   };
 
-  const copyOrderSummary = async (order) => {
-    const summary = buildOrderSummary(order);
-
+  const copyTextToClipboard = async (text, fallbackMessage) => {
     try {
-      await navigator.clipboard.writeText(summary);
-      setAdminMessage(`Pedido #${order.id} copiado para WhatsApp.`);
+      await navigator.clipboard.writeText(text);
+      return true;
     } catch (error) {
-      console.error("No se pudo copiar el pedido:", error);
-      window.prompt("Copia el pedido para WhatsApp:", summary);
+      console.error("No se pudo copiar el texto:", error);
+      window.prompt(fallbackMessage, text);
+      return false;
     }
+  };
+
+  const getWhatsAppPhone = (phoneValue) => {
+    const digits = String(phoneValue || "").replace(/\D/g, "");
+
+    if (digits.length < 8) {
+      return "";
+    }
+
+    if (digits.startsWith("549")) {
+      return digits;
+    }
+
+    if (digits.startsWith("54")) {
+      return `549${digits.slice(2)}`;
+    }
+
+    if (digits.startsWith("15") && digits.length >= 10) {
+      return `549${digits.slice(2)}`;
+    }
+
+    return `549${digits}`;
+  };
+
+  const sendOrderToWhatsApp = async (order) => {
+    const summary = buildOrderSummary(order);
+    const whatsappPhone = getWhatsAppPhone(order.customerPhone);
+
+    if (whatsappPhone) {
+      window.open(
+        `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(summary)}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+      setAdminMessage(`Pedido #${order.id} abierto en WhatsApp.`);
+      return;
+    }
+
+    const copied = await copyTextToClipboard(summary, "Copia el pedido para WhatsApp:");
+    setAdminMessage(
+      copied
+        ? `Pedido #${order.id} copiado. El telefono no parece valido para abrir WhatsApp.`
+        : `Revisa el telefono del pedido #${order.id} antes de enviarlo por WhatsApp.`
+    );
   };
 
   const resetCheckout = () => {
@@ -778,6 +821,7 @@ export default function App() {
                 {products.map((product) => {
                   const cartItem = cart.find((item) => item.id === product.id);
                   const remainingStock = product.stock - (cartItem?.quantity || 0);
+                  const hasStock = remainingStock > 0;
 
                   return (
                     <article className="product-card" key={product.id}>
@@ -801,16 +845,24 @@ export default function App() {
 
                         <div className="product-card__meta">
                           <strong>{formatPrice(product.price)}</strong>
-                          <span>Stock disponible: {remainingStock}</span>
+                          <span
+                            className={
+                              hasStock
+                                ? "stock-pill stock-pill--available"
+                                : "stock-pill stock-pill--empty"
+                            }
+                          >
+                            {hasStock ? "En stock" : "Sin stock"}
+                          </span>
                         </div>
 
                         <button
                           type="button"
                           className="primary-btn"
                           onClick={() => addToCart(product)}
-                          disabled={remainingStock <= 0}
+                          disabled={!hasStock}
                         >
-                          {remainingStock <= 0 ? "Sin stock" : "Agregar al carrito"}
+                          {hasStock ? "Agregar al carrito" : "Sin stock"}
                         </button>
                       </div>
                     </article>
@@ -1122,9 +1174,9 @@ export default function App() {
                       <button
                         type="button"
                         className="secondary-btn"
-                        onClick={() => void copyOrderSummary(order)}
+                        onClick={() => void sendOrderToWhatsApp(order)}
                       >
-                        Copiar para WhatsApp
+                        Enviar por WhatsApp
                       </button>
                     </div>
 
