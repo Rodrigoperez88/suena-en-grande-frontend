@@ -461,6 +461,10 @@ export default function App() {
       const formData = new FormData();
       formData.append("file", optimizedFile);
       formData.append("upload_preset", cloudinaryUploadPreset);
+      console.info("Cloudinary upload config", {
+        cloudName: cloudinaryCloudName,
+        uploadPreset: cloudinaryUploadPreset,
+      });
 
       const response = await fetch(
         `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/image/upload`,
@@ -473,7 +477,11 @@ export default function App() {
       const data = await response.json();
 
       if (!response.ok || !data.secure_url) {
-        throw new Error(data?.error?.message || "No se pudo subir la imagen");
+        throw new Error(
+          data?.error?.message
+            ? `${data.error.message}. Cloud: ${cloudinaryCloudName}. Preset: ${cloudinaryUploadPreset}.`
+            : "No se pudo subir la imagen"
+        );
       }
 
       setProductForm((prev) => ({
