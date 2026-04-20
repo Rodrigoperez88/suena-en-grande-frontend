@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import { SignInButton, SignedIn, SignedOut, UserButton, useAuth } from "@clerk/clerk-react";
+import { SignInButton, SignedIn, SignedOut, UserButton, useAuth, useUser } from "@clerk/clerk-react";
 import "./App.css";
 
 const ORDER_STATUSES = [
@@ -32,9 +32,14 @@ const createEmptyProductForm = () => ({
 
 export default function App() {
   const { getToken, isSignedIn, isLoaded: isAuthLoaded } = useAuth();
+  const { user } = useUser();
   const apiUrl = import.meta.env.VITE_API_URL;
   const cloudinaryCloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
   const cloudinaryUploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+  const adminEmails = (import.meta.env.VITE_CLERK_ADMIN_EMAILS || "")
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
   const [activeView, setActiveView] = useState("shop");
   const [apiMessage, setApiMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -72,6 +77,11 @@ export default function App() {
       maximumFractionDigits: 0,
     });
   }, []);
+  const currentUserEmails = user?.emailAddresses.map((email) => email.emailAddress.toLowerCase()) || [];
+  const isAdminUser =
+    isSignedIn &&
+    adminEmails.length > 0 &&
+    currentUserEmails.some((email) => adminEmails.includes(email));
 
   const getAdminRequestConfig = useCallback(async () => {
     const token = await getToken();
@@ -139,7 +149,7 @@ export default function App() {
     }
 
     const loadInitialAdminView = async () => {
-      if (!isAuthLoaded || !isSignedIn) {
+      if (!isAuthLoaded || !isAdminUser) {
         return;
       }
 
@@ -164,7 +174,7 @@ export default function App() {
     };
 
     void loadInitialAdminView();
-  }, [activeView, apiUrl, getAdminRequestConfig, isAuthLoaded, isSignedIn]);
+  }, [activeView, apiUrl, getAdminRequestConfig, isAdminUser, isAuthLoaded]);
 
   const cartTotalQuantity = useMemo(() => {
     return cart.reduce((acc, item) => acc + item.quantity, 0);
@@ -594,7 +604,16 @@ export default function App() {
       <header className="hero">
         <div className="hero__copy">
           <p className="eyebrow">Bienestar, hogar y pequenos rituales</p>
-          <h1>Suena en Grande</h1>
+          <SignedOut>
+            <SignInButton mode="modal">
+              <button type="button" className="brand-login">
+                Suena en Grande
+              </button>
+            </SignInButton>
+          </SignedOut>
+          <SignedIn>
+            <h1>Suena en Grande</h1>
+          </SignedIn>
           <p className="hero__text">
             Una tienda calida para vender productos con atmosfera, y ahora con un
             panel interno simple para gestionar pedidos y catalogo.
@@ -609,13 +628,6 @@ export default function App() {
               <UserButton />
             </div>
           </SignedIn>
-          <SignedOut>
-            <SignInButton mode="modal">
-              <button type="button" className="secondary-btn">
-                Ingresar admin
-              </button>
-            </SignInButton>
-          </SignedOut>
           <div className="badge-card">
             <span>Carrito</span>
             <strong>{cartTotalQuantity}</strong>
@@ -635,13 +647,15 @@ export default function App() {
         >
           Tienda
         </button>
-        <button
-          type="button"
-          className={activeView === "admin" ? "view-switcher__btn is-active" : "view-switcher__btn"}
-          onClick={() => setActiveView("admin")}
-        >
-          Admin
-        </button>
+        {isAdminUser ? (
+          <button
+            type="button"
+            className={activeView === "admin" ? "view-switcher__btn is-active" : "view-switcher__btn"}
+            onClick={() => setActiveView("admin")}
+          >
+            Admin
+          </button>
+        ) : null}
       </nav>
 
       {loading ? <p className="panel-message">Cargando tienda...</p> : null}
@@ -874,7 +888,16 @@ export default function App() {
         </SignedOut>
       ) : null}
 
-      {!loading && !error && activeView === "admin" ? (
+      {!loading && !error && activeView === "admin" && isSignedIn && !isAdminUser ? (
+        <main className="panel auth-panel">
+          <p className="eyebrow">Acceso restringido</p>
+          <h2>No tenes permisos de administrador</h2>
+          <p>Tu cuenta inicio sesion correctamente, pero no esta autorizada para gestionar la tienda.</p>
+          <UserButton />
+        </main>
+      ) : null}
+
+      {!loading && !error && activeView === "admin" && isAdminUser ? (
         <SignedIn>
           <main className="admin-layout">
           <section className="panel">

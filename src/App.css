@@ -63,6 +63,25 @@ img {
   letter-spacing: -0.03em;
 }
 
+.brand-login {
+  display: block;
+  margin: 0 0 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(3rem, 7vw, 5.4rem);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  text-align: left;
+}
+
+.brand-login:hover {
+  transform: none;
+}
+
 .hero__text,
 .hero__status,
 .panel__hint,
