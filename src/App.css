@@ -92,6 +92,25 @@ img {
   min-width: 160px;
 }
 
+.user-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 20px;
+  background: #fffdf9;
+  border: 1px solid rgba(139, 106, 78, 0.2);
+}
+
+.user-card span {
+  color: #856754;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 .badge-card {
   padding: 18px;
   border-radius: 20px;
@@ -172,6 +191,22 @@ img {
 .admin-side {
   display: grid;
   gap: 22px;
+}
+
+.auth-panel {
+  max-width: 560px;
+}
+
+.auth-panel h2 {
+  margin: 0 0 10px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.auth-panel p:not(.eyebrow) {
+  margin: 0 0 18px;
+  color: #6c5649;
+  line-height: 1.7;
 }
 
 .panel {

@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import { SignInButton, SignedIn, SignedOut, UserButton, useAuth } from "@clerk/clerk-react";
 import "./App.css";
 
 const ORDER_STATUSES = [
@@ -30,6 +31,7 @@ const createEmptyProductForm = () => ({
 });
 
 export default function App() {
+  const { getToken, isSignedIn, isLoaded: isAuthLoaded } = useAuth();
   const apiUrl = import.meta.env.VITE_API_URL;
   const cloudinaryCloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
   const cloudinaryUploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
@@ -71,6 +73,16 @@ export default function App() {
     });
   }, []);
 
+  const getAdminRequestConfig = useCallback(async () => {
+    const token = await getToken();
+
+    return {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+  }, [getToken]);
+
   useEffect(() => {
     const loadStore = async () => {
       try {
@@ -104,10 +116,11 @@ export default function App() {
     try {
       setAdminLoading(true);
       setAdminError("");
+      const adminConfig = await getAdminRequestConfig();
 
       const [productsResponse, ordersResponse] = await Promise.all([
-        axios.get(`${apiUrl}/admin/productos`),
-        axios.get(`${apiUrl}/admin/pedidos`),
+        axios.get(`${apiUrl}/admin/productos`, adminConfig),
+        axios.get(`${apiUrl}/admin/pedidos`, adminConfig),
       ]);
 
       setProducts(Array.isArray(productsResponse.data) ? productsResponse.data : []);
@@ -126,13 +139,18 @@ export default function App() {
     }
 
     const loadInitialAdminView = async () => {
+      if (!isAuthLoaded || !isSignedIn) {
+        return;
+      }
+
       try {
         setAdminLoading(true);
         setAdminError("");
+        const adminConfig = await getAdminRequestConfig();
 
         const [productsResponse, ordersResponse] = await Promise.all([
-          axios.get(`${apiUrl}/admin/productos`),
-          axios.get(`${apiUrl}/admin/pedidos`),
+          axios.get(`${apiUrl}/admin/productos`, adminConfig),
+          axios.get(`${apiUrl}/admin/pedidos`, adminConfig),
         ]);
 
         setProducts(Array.isArray(productsResponse.data) ? productsResponse.data : []);
@@ -146,7 +164,7 @@ export default function App() {
     };
 
     void loadInitialAdminView();
-  }, [activeView, apiUrl]);
+  }, [activeView, apiUrl, getAdminRequestConfig, isAuthLoaded, isSignedIn]);
 
   const cartTotalQuantity = useMemo(() => {
     return cart.reduce((acc, item) => acc + item.quantity, 0);
@@ -342,10 +360,14 @@ export default function App() {
       };
 
       if (productForm.id) {
-        await axios.patch(`${apiUrl}/admin/productos/${productForm.id}`, payload);
+        await axios.patch(
+          `${apiUrl}/admin/productos/${productForm.id}`,
+          payload,
+          await getAdminRequestConfig()
+        );
         setAdminMessage("Producto actualizado correctamente.");
       } else {
-        await axios.post(`${apiUrl}/admin/productos`, payload);
+        await axios.post(`${apiUrl}/admin/productos`, payload, await getAdminRequestConfig());
         setAdminMessage("Producto creado correctamente.");
       }
 
@@ -490,9 +512,13 @@ export default function App() {
       }));
 
       if (productForm.id) {
-        await axios.patch(`${apiUrl}/admin/productos/${productForm.id}`, {
-          image: data.secure_url,
-        });
+        await axios.patch(
+          `${apiUrl}/admin/productos/${productForm.id}`,
+          {
+            image: data.secure_url,
+          },
+          await getAdminRequestConfig()
+        );
         await loadAdminData();
         setAdminMessage("Imagen subida y guardada en el producto.");
       } else {
@@ -513,7 +539,7 @@ export default function App() {
       setAdminError("");
       setAdminMessage("");
 
-      await axios.delete(`${apiUrl}/admin/productos/${productId}`);
+      await axios.delete(`${apiUrl}/admin/productos/${productId}`, await getAdminRequestConfig());
       setAdminMessage("Producto eliminado correctamente.");
 
       if (productForm.id === productId) {
@@ -539,9 +565,13 @@ export default function App() {
       setAdminError("");
       setAdminMessage("");
 
-      const response = await axios.patch(`${apiUrl}/admin/pedidos/${orderId}/status`, {
-        status,
-      });
+      const response = await axios.patch(
+        `${apiUrl}/admin/pedidos/${orderId}/status`,
+        {
+          status,
+        },
+        await getAdminRequestConfig()
+      );
 
       setOrders((prev) =>
         prev.map((order) => (order.id === orderId ? response.data.order : order))
@@ -573,6 +603,19 @@ export default function App() {
         </div>
 
         <div className="hero__aside">
+          <SignedIn>
+            <div className="user-card">
+              <span>Admin</span>
+              <UserButton />
+            </div>
+          </SignedIn>
+          <SignedOut>
+            <SignInButton mode="modal">
+              <button type="button" className="secondary-btn">
+                Ingresar admin
+              </button>
+            </SignInButton>
+          </SignedOut>
           <div className="badge-card">
             <span>Carrito</span>
             <strong>{cartTotalQuantity}</strong>
@@ -814,7 +857,26 @@ export default function App() {
       ) : null}
 
       {!loading && !error && activeView === "admin" ? (
-        <main className="admin-layout">
+        <SignedOut>
+          <main className="panel auth-panel">
+            <p className="eyebrow">Acceso interno</p>
+            <h2>Ingresar al administrador</h2>
+            <p>
+              Inicia sesion con una cuenta autorizada de Clerk para gestionar pedidos,
+              productos e imagenes.
+            </p>
+            <SignInButton mode="modal">
+              <button type="button" className="primary-btn">
+                Iniciar sesion
+              </button>
+            </SignInButton>
+          </main>
+        </SignedOut>
+      ) : null}
+
+      {!loading && !error && activeView === "admin" ? (
+        <SignedIn>
+          <main className="admin-layout">
           <section className="panel">
             <div className="panel__header">
               <div>
@@ -1089,7 +1151,8 @@ export default function App() {
               </div>
             </div>
           </section>
-        </main>
+          </main>
+        </SignedIn>
       ) : null}
     </div>
   );
