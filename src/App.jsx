@@ -30,6 +30,16 @@ const createEmptyProductForm = () => ({
   ...EMPTY_PRODUCT_FORM,
 });
 
+const EMPTY_CATEGORY_FORM = {
+  id: null,
+  name: "",
+  image: "",
+};
+
+const createEmptyCategoryForm = () => ({
+  ...EMPTY_CATEGORY_FORM,
+});
+
 export default function App() {
   const { getToken, isSignedIn, isLoaded: isAuthLoaded } = useAuth();
   const { user } = useUser();
@@ -46,6 +56,7 @@ export default function App() {
   const [error, setError] = useState("");
 
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [orders, setOrders] = useState([]);
   const [cart, setCart] = useState([]);
 
@@ -65,12 +76,17 @@ export default function App() {
   const [adminError, setAdminError] = useState("");
   const [adminMessage, setAdminMessage] = useState("");
   const [productForm, setProductForm] = useState(createEmptyProductForm);
+  const [categoryForm, setCategoryForm] = useState(createEmptyCategoryForm);
   const [savingProduct, setSavingProduct] = useState(false);
+  const [savingCategory, setSavingCategory] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingCategoryImage, setUploadingCategoryImage] = useState(false);
   const [statusSavingId, setStatusSavingId] = useState(null);
   const [deletingProductId, setDeletingProductId] = useState(null);
+  const [deletingCategoryId, setDeletingCategoryId] = useState(null);
   const [orderStatusFilter, setOrderStatusFilter] = useState("todos");
   const [orderSearch, setOrderSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("todos");
 
   const currencyFormatter = useMemo(() => {
     return new Intl.NumberFormat("es-AR", {
@@ -149,13 +165,15 @@ export default function App() {
         setLoading(true);
         setError("");
 
-        const [healthResponse, productsResponse] = await Promise.all([
+        const [healthResponse, productsResponse, categoriesResponse] = await Promise.all([
           axios.get(`${apiUrl}/`),
           axios.get(`${apiUrl}/productos`),
+          axios.get(`${apiUrl}/categorias`),
         ]);
 
         setApiMessage(healthResponse.data.message || "");
         setProducts(Array.isArray(productsResponse.data) ? productsResponse.data : []);
+        setCategories(Array.isArray(categoriesResponse.data) ? categoriesResponse.data : []);
       } catch (err) {
         console.error("Error al cargar tienda:", err);
         setError("No se pudo conectar con el backend.");
@@ -172,19 +190,26 @@ export default function App() {
     setProducts(Array.isArray(response.data) ? response.data : []);
   };
 
+  const loadCategories = async () => {
+    const response = await axios.get(`${apiUrl}/categorias`);
+    setCategories(Array.isArray(response.data) ? response.data : []);
+  };
+
   const loadAdminData = async () => {
     try {
       setAdminLoading(true);
       setAdminError("");
       const adminConfig = await getAdminRequestConfig();
 
-      const [productsResponse, ordersResponse] = await Promise.all([
+      const [productsResponse, ordersResponse, categoriesResponse] = await Promise.all([
         axios.get(`${apiUrl}/admin/productos`, adminConfig),
         axios.get(`${apiUrl}/admin/pedidos`, adminConfig),
+        axios.get(`${apiUrl}/admin/categorias`, adminConfig),
       ]);
 
       setProducts(Array.isArray(productsResponse.data) ? productsResponse.data : []);
       setOrders(Array.isArray(ordersResponse.data) ? ordersResponse.data : []);
+      setCategories(Array.isArray(categoriesResponse.data) ? categoriesResponse.data : []);
     } catch (err) {
       console.error("Error al cargar panel admin:", err);
       setAdminError("No se pudieron cargar los datos del panel interno.");
@@ -208,13 +233,15 @@ export default function App() {
         setAdminError("");
         const adminConfig = await getAdminRequestConfig();
 
-        const [productsResponse, ordersResponse] = await Promise.all([
+        const [productsResponse, ordersResponse, categoriesResponse] = await Promise.all([
           axios.get(`${apiUrl}/admin/productos`, adminConfig),
           axios.get(`${apiUrl}/admin/pedidos`, adminConfig),
+          axios.get(`${apiUrl}/admin/categorias`, adminConfig),
         ]);
 
         setProducts(Array.isArray(productsResponse.data) ? productsResponse.data : []);
         setOrders(Array.isArray(ordersResponse.data) ? ordersResponse.data : []);
+        setCategories(Array.isArray(categoriesResponse.data) ? categoriesResponse.data : []);
       } catch (err) {
         console.error("Error al cargar panel admin:", err);
         setAdminError("No se pudieron cargar los datos del panel interno.");
@@ -491,6 +518,61 @@ export default function App() {
     setProductForm(createEmptyProductForm());
   };
 
+  const startEditingCategory = (category) => {
+    setCategoryForm({
+      id: category.id,
+      name: category.name || "",
+      image: category.image || "",
+    });
+    setAdminMessage("");
+    setAdminError("");
+  };
+
+  const resetCategoryForm = () => {
+    setCategoryForm(createEmptyCategoryForm());
+  };
+
+  const saveCategory = async () => {
+    try {
+      setSavingCategory(true);
+      setAdminError("");
+      setAdminMessage("");
+
+      const payload = {
+        name: categoryForm.name,
+        image: categoryForm.image,
+      };
+
+      if (categoryForm.id) {
+        await axios.patch(
+          `${apiUrl}/admin/categorias/${categoryForm.id}`,
+          payload,
+          await getAdminRequestConfig()
+        );
+        setAdminMessage("Categoria actualizada correctamente.");
+      } else {
+        await axios.post(`${apiUrl}/admin/categorias`, payload, await getAdminRequestConfig());
+        setAdminMessage("Categoria creada correctamente.");
+      }
+
+      resetCategoryForm();
+      await loadAdminData();
+      await loadCategories();
+    } catch (err) {
+      console.error("Error al guardar categoria:", err);
+      const details = err?.response?.data?.details;
+      setAdminError(
+        Array.isArray(details) && details.length > 0
+          ? details.join(" ")
+          : err?.response?.data?.error ||
+              err?.response?.data?.detalle ||
+              "No se pudo guardar la categoria."
+      );
+    } finally {
+      setSavingCategory(false);
+    }
+  };
+
   const saveProduct = async () => {
     try {
       setSavingProduct(true);
@@ -680,6 +762,71 @@ export default function App() {
     }
   };
 
+  const uploadCategoryImage = async (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      setAdminError("Formato no permitido. Usa JPG, PNG o WEBP.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      setAdminError("La imagen supera los 5 MB. Elige un archivo mas liviano.");
+      event.target.value = "";
+      return;
+    }
+
+    if (!cloudinaryCloudName || !cloudinaryUploadPreset) {
+      setAdminError(
+        "Faltan las variables de Cloudinary. Configura VITE_CLOUDINARY_CLOUD_NAME y VITE_CLOUDINARY_UPLOAD_PRESET."
+      );
+      event.target.value = "";
+      return;
+    }
+
+    try {
+      setUploadingCategoryImage(true);
+      setAdminError("");
+      setAdminMessage("");
+
+      const optimizedFile = await resizeImageFile(file);
+      const formData = new FormData();
+      formData.append("file", optimizedFile);
+      formData.append("upload_preset", cloudinaryUploadPreset);
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.secure_url) {
+        throw new Error(data?.error?.message || "No se pudo subir la imagen");
+      }
+
+      setCategoryForm((prev) => ({
+        ...prev,
+        image: data.secure_url,
+      }));
+      setAdminMessage("Imagen subida. Guarda la categoria para publicarla.");
+    } catch (err) {
+      console.error("Error al subir imagen de categoria a Cloudinary:", err);
+      setAdminError(err.message || "No se pudo subir la imagen.");
+    } finally {
+      setUploadingCategoryImage(false);
+      event.target.value = "";
+    }
+  };
+
   const deleteProduct = async (productId) => {
     try {
       setDeletingProductId(productId);
@@ -736,10 +883,43 @@ export default function App() {
     }
   };
 
+  const deleteCategory = async (categoryId) => {
+    try {
+      setDeletingCategoryId(categoryId);
+      setAdminError("");
+      setAdminMessage("");
+
+      await axios.delete(`${apiUrl}/admin/categorias/${categoryId}`, await getAdminRequestConfig());
+      setAdminMessage("Categoria eliminada correctamente.");
+
+      if (categoryForm.id === categoryId) {
+        resetCategoryForm();
+      }
+
+      await loadAdminData();
+      await loadCategories();
+    } catch (err) {
+      console.error("Error al eliminar categoria:", err);
+      setAdminError(
+        err?.response?.data?.error ||
+          err?.response?.data?.detalle ||
+          "No se pudo eliminar la categoria."
+      );
+    } finally {
+      setDeletingCategoryId(null);
+    }
+  };
+
   const featuredHeroProduct = products.find((product) => product.image) || products[0];
-  const productCategories = [
-    ...new Set(products.map((product) => product.category).filter(Boolean)),
-  ].slice(0, 5);
+  const categoryItems = categories.length > 0
+    ? categories
+    : [
+        ...new Set(products.map((product) => product.category).filter(Boolean)),
+      ].map((categoryName) => ({
+        id: categoryName,
+        name: categoryName,
+        image: products.find((product) => product.category === categoryName)?.image || "",
+      }));
   const productsByCategory = products.reduce((groups, product) => {
     const category = product.category?.trim() || "Sin categoria";
 
@@ -750,7 +930,9 @@ export default function App() {
     groups[category].push(product);
     return groups;
   }, {});
-  const categorySections = Object.entries(productsByCategory);
+  const categorySections = Object.entries(productsByCategory).filter(([category]) => {
+    return selectedCategory === "todos" || category === selectedCategory;
+  });
 
   return (
     <div className="page-shell">
@@ -907,11 +1089,49 @@ export default function App() {
               </article>
             </div>
 
-            {productCategories.length > 0 ? (
-              <div className="category-strip" aria-label="Categorias del catalogo">
-                {productCategories.map((category) => (
-                  <span key={category}>{category}</span>
-                ))}
+            {categoryItems.length > 0 ? (
+              <div className="category-showcase" aria-label="Categorias del catalogo">
+                <button
+                  type="button"
+                  className={
+                    selectedCategory === "todos"
+                      ? "category-item category-item--active"
+                      : "category-item"
+                  }
+                  onClick={() => setSelectedCategory("todos")}
+                >
+                  <span className="category-item__image category-item__image--all">Todo</span>
+                  <strong>Todas</strong>
+                  <small>{products.length} productos</small>
+                </button>
+                {categoryItems.map((category) => {
+                  const categoryProductsCount = products.filter(
+                    (product) => product.category === category.name
+                  ).length;
+
+                  return (
+                    <button
+                      type="button"
+                      className={
+                        selectedCategory === category.name
+                          ? "category-item category-item--active"
+                          : "category-item"
+                      }
+                      key={category.id}
+                      onClick={() => setSelectedCategory(category.name)}
+                    >
+                      <span className="category-item__image">
+                        {category.image ? (
+                          <img src={category.image} alt={category.name} />
+                        ) : (
+                          category.name.slice(0, 1)
+                        )}
+                      </span>
+                      <strong>{category.name}</strong>
+                      <small>{categoryProductsCount} productos</small>
+                    </button>
+                  );
+                })}
               </div>
             ) : null}
 
@@ -1321,6 +1541,124 @@ export default function App() {
             <div className="panel">
               <div className="panel__header">
                 <div>
+                  <p className="eyebrow">Categorias</p>
+                  <h2>{categoryForm.id ? "Editar categoria" : "Nueva categoria"}</h2>
+                </div>
+                {categoryForm.id ? (
+                  <button type="button" className="secondary-btn" onClick={resetCategoryForm}>
+                    Cancelar
+                  </button>
+                ) : null}
+              </div>
+
+              <div className="form-grid">
+                <div className="field-group">
+                  <label htmlFor="categoryName">Nombre</label>
+                  <input
+                    id="categoryName"
+                    type="text"
+                    value={categoryForm.name}
+                    onChange={(event) =>
+                      setCategoryForm((prev) => ({ ...prev, name: event.target.value }))
+                    }
+                    placeholder="Sahumerios, velas, deco..."
+                  />
+                </div>
+
+                <div className="field-group">
+                  <label htmlFor="categoryImageFile">Imagen</label>
+                  <input
+                    id="categoryImageFile"
+                    type="file"
+                    accept="image/*"
+                    onChange={(event) => void uploadCategoryImage(event)}
+                    disabled={uploadingCategoryImage}
+                  />
+                  <p className="field-help">
+                    {uploadingCategoryImage
+                      ? "Subiendo imagen..."
+                      : "Se usa como portada de la categoria."}
+                  </p>
+                </div>
+
+                <div className="field-group field-group--full">
+                  <label htmlFor="categoryImage">URL de imagen</label>
+                  <input
+                    id="categoryImage"
+                    type="text"
+                    value={categoryForm.image}
+                    onChange={(event) =>
+                      setCategoryForm((prev) => ({ ...prev, image: event.target.value }))
+                    }
+                    placeholder="https://..."
+                  />
+                </div>
+
+                {categoryForm.image ? (
+                  <div className="field-group field-group--full">
+                    <div className="image-preview category-preview">
+                      <img src={categoryForm.image} alt={categoryForm.name || "Categoria"} />
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+
+              <button
+                type="button"
+                className="primary-btn primary-btn--full"
+                onClick={saveCategory}
+                disabled={savingCategory || uploadingCategoryImage}
+              >
+                {savingCategory
+                  ? "Guardando..."
+                  : categoryForm.id
+                    ? "Actualizar categoria"
+                    : "Crear categoria"}
+              </button>
+
+              {categories.length > 0 ? (
+                <div className="admin-categories">
+                  {categories.map((category) => (
+                    <article className="admin-category-card" key={category.id}>
+                      <div className="admin-category-card__image">
+                        {category.image ? (
+                          <img src={category.image} alt={category.name} />
+                        ) : (
+                          <span>{category.name.slice(0, 1)}</span>
+                        )}
+                      </div>
+                      <div>
+                        <h3>{category.name}</h3>
+                        <p>
+                          {products.filter((product) => product.category === category.name).length} productos
+                        </p>
+                      </div>
+                      <div className="admin-category-card__actions">
+                        <button
+                          type="button"
+                          className="secondary-btn"
+                          onClick={() => startEditingCategory(category)}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          className="danger-btn"
+                          onClick={() => void deleteCategory(category.id)}
+                          disabled={deletingCategoryId === category.id}
+                        >
+                          {deletingCategoryId === category.id ? "Eliminando..." : "Eliminar"}
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+
+            <div className="panel">
+              <div className="panel__header">
+                <div>
                   <p className="eyebrow">Catalogo</p>
                   <h2>{productForm.id ? "Editar producto" : "Nuevo producto"}</h2>
                 </div>
@@ -1347,15 +1685,32 @@ export default function App() {
 
                 <div className="field-group">
                   <label htmlFor="productCategory">Categoria</label>
-                  <input
-                    id="productCategory"
-                    type="text"
-                    value={productForm.category}
-                    onChange={(event) =>
-                      setProductForm((prev) => ({ ...prev, category: event.target.value }))
-                    }
-                    placeholder="Sahumerios, decoracion..."
-                  />
+                  {categories.length > 0 ? (
+                    <select
+                      id="productCategory"
+                      value={productForm.category}
+                      onChange={(event) =>
+                        setProductForm((prev) => ({ ...prev, category: event.target.value }))
+                      }
+                    >
+                      <option value="">Sin categoria</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.name}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      id="productCategory"
+                      type="text"
+                      value={productForm.category}
+                      onChange={(event) =>
+                        setProductForm((prev) => ({ ...prev, category: event.target.value }))
+                      }
+                      placeholder="Primero crea categorias arriba"
+                    />
+                  )}
                 </div>
 
                 <div className="field-group">
