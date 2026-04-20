@@ -1,9 +1,8 @@
 :root {
   color: #2e221d;
   background:
-    radial-gradient(circle at 8% 4%, rgba(237, 183, 129, 0.5), transparent 28%),
-    radial-gradient(circle at 92% 18%, rgba(142, 105, 66, 0.16), transparent 30%),
-    linear-gradient(180deg, #fbf3e9 0%, #f6e6d6 46%, #efe0cf 100%);
+    radial-gradient(circle at 12% 0%, rgba(225, 181, 126, 0.25), transparent 28%),
+    linear-gradient(180deg, #fffaf4 0%, #f8eee3 44%, #f2e4d5 100%);
   font-family: Georgia, "Times New Roman", serif;
 }
 
@@ -49,24 +48,25 @@ img {
   background-image:
     linear-gradient(rgba(108, 78, 55, 0.035) 1px, transparent 1px),
     linear-gradient(90deg, rgba(108, 78, 55, 0.03) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.65), transparent 70%);
+  background-size: 56px 56px;
+  opacity: 0.65;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.42), transparent 62%);
 }
 
 .hero {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.58fr) minmax(130px, 0.22fr);
+  grid-template-columns: minmax(0, 1.12fr) minmax(300px, 0.58fr) minmax(130px, 0.22fr);
   align-items: stretch;
   gap: 24px;
   padding: 34px;
   overflow: hidden;
   border: 1px solid rgba(137, 96, 65, 0.18);
-  border-radius: 34px;
+  border-radius: 16px;
   background:
-    linear-gradient(135deg, rgba(255, 250, 244, 0.96), rgba(244, 222, 201, 0.88)),
-    #fff7f2;
-  box-shadow: 0 28px 80px rgba(88, 58, 41, 0.14);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(246, 230, 212, 0.88)),
+    #fffaf4;
+  box-shadow: 0 18px 46px rgba(88, 58, 41, 0.09);
 }
 
 .hero::after {
@@ -77,7 +77,7 @@ img {
   width: 320px;
   height: 320px;
   border-radius: 999px;
-  background: rgba(171, 101, 63, 0.12);
+  background: rgba(201, 132, 83, 0.1);
   filter: blur(8px);
 }
 
@@ -90,9 +90,9 @@ img {
 .hero h1 {
   margin: 0 0 12px;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(3rem, 7vw, 5.4rem);
-  line-height: 0.95;
-  letter-spacing: -0.03em;
+  font-size: clamp(3rem, 7vw, 5.15rem);
+  line-height: 0.96;
+  letter-spacing: -0.04em;
 }
 
 .brand-login {
@@ -128,8 +128,25 @@ img {
 .hero__text {
   max-width: 640px;
   margin: 0 0 20px;
-  font-size: 1.08rem;
-  line-height: 1.7;
+  font-size: 1.04rem;
+  line-height: 1.72;
+}
+
+.hero__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.hero__nav span {
+  padding: 9px 13px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(139, 106, 78, 0.14);
+  color: #725744;
+  font-size: 0.82rem;
+  font-weight: 800;
 }
 
 .hero__actions {
@@ -157,11 +174,11 @@ img {
   z-index: 1;
   min-height: 300px;
   overflow: hidden;
-  border-radius: 30px;
+  border-radius: 16px;
   background:
     radial-gradient(circle at 30% 20%, rgba(255, 239, 219, 0.82), transparent 34%),
     linear-gradient(150deg, #b8794e, #ecd0b8 54%, #fff7ef);
-  box-shadow: 0 24px 42px rgba(103, 66, 43, 0.2);
+  box-shadow: 0 20px 36px rgba(103, 66, 43, 0.14);
 }
 
 .hero__visual img {
@@ -211,7 +228,7 @@ img {
   max-width: 210px;
   padding: 14px 16px;
   border: 1px solid rgba(255, 248, 240, 0.42);
-  border-radius: 20px;
+  border-radius: 14px;
   background: rgba(255, 248, 240, 0.82);
   backdrop-filter: blur(12px);
   box-shadow: 0 18px 34px rgba(58, 35, 24, 0.18);
@@ -248,7 +265,7 @@ img {
   justify-content: space-between;
   gap: 12px;
   padding: 14px 18px;
-  border-radius: 20px;
+  border-radius: 14px;
   background: #fffdf9;
   border: 1px solid rgba(139, 106, 78, 0.2);
 }
@@ -263,7 +280,7 @@ img {
 
 .badge-card {
   padding: 18px;
-  border-radius: 20px;
+  border-radius: 14px;
   background: #fffdf9;
   border: 1px solid rgba(139, 106, 78, 0.2);
   text-align: center;
@@ -292,8 +309,8 @@ img {
   gap: 10px;
   margin: 22px 0 24px;
   padding: 8px;
-  border-radius: 999px;
-  background: rgba(255, 251, 247, 0.78);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
   border: 1px solid rgba(137, 96, 65, 0.14);
   backdrop-filter: blur(12px);
 }
@@ -304,7 +321,7 @@ img {
 .primary-btn,
 .text-btn {
   border: none;
-  border-radius: 16px;
+  border-radius: 12px;
   transition:
     transform 0.18s ease,
     background 0.18s ease,
@@ -319,7 +336,7 @@ img {
 }
 
 .view-switcher__btn.is-active {
-  background: #35271f;
+  background: #2f231d;
   color: #fff6ef;
   box-shadow: 0 10px 20px rgba(53, 39, 31, 0.16);
 }
@@ -362,10 +379,10 @@ img {
 
 .panel {
   padding: 24px;
-  border-radius: 30px;
-  background: rgba(255, 250, 246, 0.86);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.86);
   border: 1px solid rgba(137, 96, 65, 0.14);
-  box-shadow: 0 18px 44px rgba(99, 69, 53, 0.08);
+  box-shadow: 0 14px 34px rgba(99, 69, 53, 0.06);
   backdrop-filter: blur(10px);
 }
 
@@ -421,7 +438,7 @@ img {
 }
 
 .product-grid {
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
 }
 
 .metrics-grid {
@@ -437,26 +454,28 @@ img {
 .summary-card,
 .form-card,
 .empty-state {
-  border-radius: 22px;
-  background: #fffdfa;
+  border-radius: 14px;
+  background: #fff;
   border: 1px solid rgba(151, 111, 81, 0.14);
 }
 
 .product-card {
+  position: relative;
   overflow: hidden;
-  box-shadow: 0 18px 38px rgba(107, 78, 60, 0.08);
+  box-shadow: 0 10px 24px rgba(107, 78, 60, 0.06);
   transition:
     transform 0.18s ease,
     box-shadow 0.18s ease;
 }
 
 .product-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 26px 48px rgba(107, 78, 60, 0.14);
+  transform: translateY(-3px);
+  box-shadow: 0 18px 34px rgba(107, 78, 60, 0.12);
 }
 
 .product-card__media {
-  aspect-ratio: 1 / 0.9;
+  position: relative;
+  aspect-ratio: 1 / 0.88;
   background:
     radial-gradient(circle at top left, rgba(255, 248, 236, 0.9), transparent 42%),
     linear-gradient(145deg, rgba(207, 147, 105, 0.72), rgba(251, 238, 224, 0.94));
@@ -474,6 +493,22 @@ img {
   height: 100%;
   object-fit: cover;
   transition: transform 0.32s ease;
+}
+
+.product-card__badge {
+  position: absolute;
+  z-index: 2;
+  top: 12px;
+  left: 12px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #6b4e3d;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 8px 16px rgba(73, 48, 34, 0.08);
 }
 
 .product-card:hover .product-card__media img {
@@ -528,23 +563,23 @@ img {
   background: rgba(196, 76, 76, 0.12);
 }
 
-.ritual-grid {
+.store-benefits {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
   margin-bottom: 22px;
 }
 
-.ritual-grid article {
+.store-benefits article {
   padding: 16px;
   border: 1px solid rgba(151, 111, 81, 0.12);
-  border-radius: 22px;
+  border-radius: 14px;
   background:
-    linear-gradient(145deg, rgba(255, 253, 249, 0.78), rgba(249, 232, 214, 0.58)),
-    #fffaf4;
+    linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(250, 236, 219, 0.5)),
+    #fff;
 }
 
-.ritual-grid span {
+.store-benefits span {
   display: inline-flex;
   margin-bottom: 12px;
   color: #a06f4d;
@@ -553,7 +588,7 @@ img {
   font-weight: 700;
 }
 
-.ritual-grid strong {
+.store-benefits strong {
   display: block;
   margin-bottom: 8px;
   color: #35271f;
@@ -561,10 +596,27 @@ img {
   font-size: 1.1rem;
 }
 
-.ritual-grid p {
+.store-benefits p {
   margin: 0;
   color: #6c5649;
   line-height: 1.55;
+}
+
+.category-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: -4px 0 22px;
+}
+
+.category-strip span {
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid rgba(151, 111, 81, 0.14);
+  color: #5f493b;
+  font-size: 0.88rem;
+  font-weight: 800;
 }
 
 .cart-panel {
@@ -972,7 +1024,7 @@ img {
     grid-column: 1 / -1;
   }
 
-  .ritual-grid {
+  .store-benefits {
     grid-template-columns: 1fr;
   }
 }

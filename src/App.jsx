@@ -737,6 +737,9 @@ export default function App() {
   };
 
   const featuredHeroProduct = products.find((product) => product.image) || products[0];
+  const productCategories = [
+    ...new Set(products.map((product) => product.category).filter(Boolean)),
+  ].slice(0, 5);
 
   return (
     <div className="page-shell">
@@ -757,6 +760,11 @@ export default function App() {
             Aromas, texturas y objetos elegidos para transformar tu casa en un
             refugio calido. Compra simple, atencion cercana y productos con alma.
           </p>
+          <div className="hero__nav">
+            <span>Productos</span>
+            <span>Pedidos por WhatsApp</span>
+            <span>Deco & aromas</span>
+          </div>
           <div className="hero__actions">
             <button type="button" className="primary-btn" onClick={() => setActiveView("shop")}>
               Ver catalogo
@@ -827,30 +835,38 @@ export default function App() {
             <div className="panel__header">
               <div>
                 <p className="eyebrow">Catalogo</p>
-                <h2>Rituales para regalar y habitar</h2>
+                <h2>Productos destacados</h2>
               </div>
               <p className="panel__hint">
                 Elegi tus favoritos y arma tu pedido en pocos pasos.
               </p>
             </div>
 
-            <div className="ritual-grid">
+            <div className="store-benefits">
               <article>
                 <span>01</span>
-                <strong>Aromas que abrazan</strong>
-                <p>Sahumerios y perfumes para crear clima desde el primer momento.</p>
+                <strong>Coordinamos tu pedido</strong>
+                <p>Retiro o envio segun tu zona, con contacto directo.</p>
               </article>
               <article>
                 <span>02</span>
-                <strong>Calidez visual</strong>
-                <p>Objetos simples que suman luz, textura y presencia al hogar.</p>
+                <strong>Productos seleccionados</strong>
+                <p>Aromas, deco y pequenos rituales para el hogar.</p>
               </article>
               <article>
                 <span>03</span>
-                <strong>Compra tranquila</strong>
-                <p>Pedido claro, stock visible y coordinacion directa para entregar.</p>
+                <strong>Compra simple</strong>
+                <p>Armas el carrito y confirmamos todo por WhatsApp.</p>
               </article>
             </div>
+
+            {productCategories.length > 0 ? (
+              <div className="category-strip" aria-label="Categorias del catalogo">
+                {productCategories.map((category) => (
+                  <span key={category}>{category}</span>
+                ))}
+              </div>
+            ) : null}
 
             {products.length === 0 ? (
               <div className="empty-state">
@@ -867,6 +883,9 @@ export default function App() {
                   return (
                     <article className="product-card" key={product.id}>
                       <div className="product-card__media">
+                        <span className="product-card__badge">
+                          {hasStock ? "Envio coordinado" : "Sin stock"}
+                        </span>
                         {product.image ? (
                           <img src={product.image} alt={product.name} />
                         ) : (
