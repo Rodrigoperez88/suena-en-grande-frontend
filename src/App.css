@@ -710,9 +710,20 @@ img {
   gap: 8px;
 }
 
+.order-card__date {
+  margin: 6px 0 0;
+  color: #8a7161;
+  font-size: 0.9rem;
+}
+
 .order-card__details p {
   margin: 0;
   line-height: 1.5;
+}
+
+.order-card__actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .order-item {

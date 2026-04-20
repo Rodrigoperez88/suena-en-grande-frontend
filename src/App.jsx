@@ -236,6 +236,50 @@ export default function App() {
 
   const formatPrice = (value) => currencyFormatter.format(value || 0);
 
+  const formatOrderDate = (dateValue) => {
+    if (!dateValue) {
+      return "Fecha no disponible";
+    }
+
+    return new Intl.DateTimeFormat("es-AR", {
+      dateStyle: "short",
+      timeStyle: "short",
+    }).format(new Date(dateValue));
+  };
+
+  const buildOrderSummary = (order) => {
+    const itemsText = order.items
+      .map((item) => `- ${item.productName} x ${item.quantity}: ${formatPrice(item.subtotal)}`)
+      .join("\n");
+
+    return [
+      `Pedido #${order.id} - Suena en Grande`,
+      `Cliente: ${order.customerName}`,
+      `Telefono: ${order.customerPhone}`,
+      `Entrega: ${order.deliveryMethod}`,
+      `Direccion: ${order.address || "Retira en punto acordado"}`,
+      `Estado: ${order.status}`,
+      "",
+      "Productos:",
+      itemsText,
+      "",
+      `Total: ${formatPrice(order.total)}`,
+      `Notas: ${order.notes || "Sin notas"}`,
+    ].join("\n");
+  };
+
+  const copyOrderSummary = async (order) => {
+    const summary = buildOrderSummary(order);
+
+    try {
+      await navigator.clipboard.writeText(summary);
+      setAdminMessage(`Pedido #${order.id} copiado para WhatsApp.`);
+    } catch (error) {
+      console.error("No se pudo copiar el pedido:", error);
+      window.prompt("Copia el pedido para WhatsApp:", summary);
+    }
+  };
+
   const resetCheckout = () => {
     setCheckout({
       customerName: "",
@@ -1046,6 +1090,7 @@ export default function App() {
                         <p className="order-card__meta">
                           {order.customerPhone} - {order.deliveryMethod}
                         </p>
+                        <p className="order-card__date">{formatOrderDate(order.createdAt)}</p>
                       </div>
 
                       <div className="order-card__status">
@@ -1071,6 +1116,16 @@ export default function App() {
                       <p>
                         <strong>Notas:</strong> {order.notes || "Sin notas"}
                       </p>
+                    </div>
+
+                    <div className="order-card__actions">
+                      <button
+                        type="button"
+                        className="secondary-btn"
+                        onClick={() => void copyOrderSummary(order)}
+                      >
+                        Copiar para WhatsApp
+                      </button>
                     </div>
 
                     <div className="order-items">
