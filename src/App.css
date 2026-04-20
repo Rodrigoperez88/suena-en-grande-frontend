@@ -1,9 +1,11 @@
 :root {
   color: #2f2119;
   background:
-    radial-gradient(circle at 10% 0%, rgba(220, 150, 89, 0.24), transparent 30%),
-    radial-gradient(circle at 88% 12%, rgba(127, 85, 54, 0.16), transparent 26%),
-    linear-gradient(180deg, #fbf1e6 0%, #f3dcc7 52%, #ecd2bb 100%);
+    linear-gradient(180deg, rgba(251, 241, 230, 0.92), rgba(243, 220, 199, 0.88) 52%, rgba(236, 210, 187, 0.94)),
+    url("https://res.cloudinary.com/dfetskjy0/image/upload/v1776705932/HgDn10BVX_1256x620__1_nriyzo.jpg");
+  background-attachment: fixed;
+  background-position: center top;
+  background-size: cover;
   font-family: Georgia, "Times New Roman", serif;
 }
 
@@ -14,7 +16,7 @@
 body {
   margin: 0;
   color: #2f2119;
-  background: #fbf1e6;
+  background: transparent;
   font-family: "Segoe UI", sans-serif;
   overflow-x: hidden;
 }
@@ -1309,6 +1311,11 @@ img {
 }
 
 @media (max-width: 720px) {
+  :root {
+    background-attachment: scroll;
+    background-position: center top;
+  }
+
   .page-shell {
     padding: 0 14px 14px;
   }
