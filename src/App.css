@@ -1260,7 +1260,14 @@ img {
 }
 
 .empty-state--soft {
-  background: rgba(255, 253, 250, 0.72);
+  background:
+    radial-gradient(circle at top left, rgba(255, 248, 236, 0.9), transparent 42%),
+    rgba(255, 253, 250, 0.78);
+}
+
+.empty-state--soft .secondary-btn {
+  justify-self: center;
+  margin-top: 6px;
 }
 
 .order-card {

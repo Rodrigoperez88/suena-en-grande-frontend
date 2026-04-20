@@ -71,6 +71,7 @@ export default function App() {
   const [submittingOrder, setSubmittingOrder] = useState(false);
   const [orderMessage, setOrderMessage] = useState("");
   const [orderError, setOrderError] = useState("");
+  const [lastOrderId, setLastOrderId] = useState(null);
 
   const [adminLoading, setAdminLoading] = useState(false);
   const [adminError, setAdminError] = useState("");
@@ -436,6 +437,7 @@ export default function App() {
     setCheckoutErrors((prev) => ({ ...prev, [field]: "" }));
     setOrderError("");
     setOrderMessage("");
+    setLastOrderId(null);
   };
 
   const validateCheckout = () => {
@@ -487,6 +489,7 @@ export default function App() {
 
       const response = await axios.post(`${apiUrl}/pedidos`, payload);
 
+      setLastOrderId(response.data.orderId);
       setOrderMessage(`Pedido enviado con exito. Numero: #${response.data.orderId}`);
       setCart([]);
       resetCheckout();
@@ -1242,8 +1245,28 @@ export default function App() {
 
             {cart.length === 0 ? (
               <div className="empty-state empty-state--soft">
-                <h3>Tu carrito esta vacio</h3>
-                <p>Agrega productos para comenzar el pedido.</p>
+                {lastOrderId ? (
+                  <>
+                    <p className="eyebrow eyebrow--compact">Pedido recibido</p>
+                    <h3>Gracias por tu compra</h3>
+                    <p>
+                      Tu pedido #{lastOrderId} ya quedo registrado. Te vamos a contactar
+                      por WhatsApp para confirmar entrega y forma de pago.
+                    </p>
+                    <button
+                      type="button"
+                      className="secondary-btn"
+                      onClick={() => scrollToSection("productos")}
+                    >
+                      Volver al catalogo
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <h3>Tu carrito esta vacio</h3>
+                    <p>Agrega productos para comenzar el pedido.</p>
+                  </>
+                )}
               </div>
             ) : (
               <>
