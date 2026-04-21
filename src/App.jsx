@@ -192,23 +192,40 @@ export default function App() {
     };
   }, [getToken]);
 
+  const loadStoreSettings = async (adminConfig = null) => {
+    try {
+      const response = await axios.get(
+        `${apiUrl}${adminConfig ? "/admin/configuracion" : "/configuracion"}`,
+        adminConfig || undefined
+      );
+
+      return response.data || {};
+    } catch (err) {
+      if (err?.response?.status === 404) {
+        return {};
+      }
+
+      throw err;
+    }
+  };
+
   useEffect(() => {
     const loadStore = async () => {
       try {
         setLoading(true);
         setError("");
 
-        const [healthResponse, productsResponse, categoriesResponse, settingsResponse] = await Promise.all([
+        const [healthResponse, productsResponse, categoriesResponse, settings] = await Promise.all([
           axios.get(`${apiUrl}/`),
           axios.get(`${apiUrl}/productos`),
           axios.get(`${apiUrl}/categorias`),
-          axios.get(`${apiUrl}/configuracion`),
+          loadStoreSettings(),
         ]);
 
         setApiMessage(healthResponse.data.message || "");
         setProducts(Array.isArray(productsResponse.data) ? productsResponse.data : []);
         setCategories(Array.isArray(categoriesResponse.data) ? categoriesResponse.data : []);
-        setStoreSettings(settingsResponse.data || {});
+        setStoreSettings(settings);
       } catch (err) {
         console.error("Error al cargar tienda:", err);
         setError("No se pudo conectar con el backend.");
@@ -236,17 +253,17 @@ export default function App() {
       setAdminError("");
       const adminConfig = await getAdminRequestConfig();
 
-      const [productsResponse, ordersResponse, categoriesResponse, settingsResponse] = await Promise.all([
+      const [productsResponse, ordersResponse, categoriesResponse, settings] = await Promise.all([
         axios.get(`${apiUrl}/admin/productos`, adminConfig),
         axios.get(`${apiUrl}/admin/pedidos`, adminConfig),
         axios.get(`${apiUrl}/admin/categorias`, adminConfig),
-        axios.get(`${apiUrl}/admin/configuracion`, adminConfig),
+        loadStoreSettings(adminConfig),
       ]);
 
       setProducts(Array.isArray(productsResponse.data) ? productsResponse.data : []);
       setOrders(Array.isArray(ordersResponse.data) ? ordersResponse.data : []);
       setCategories(Array.isArray(categoriesResponse.data) ? categoriesResponse.data : []);
-      setStoreSettings(settingsResponse.data || {});
+      setStoreSettings(settings);
     } catch (err) {
       console.error("Error al cargar panel admin:", err);
       setAdminError("No se pudieron cargar los datos del panel interno.");
@@ -270,17 +287,17 @@ export default function App() {
         setAdminError("");
         const adminConfig = await getAdminRequestConfig();
 
-        const [productsResponse, ordersResponse, categoriesResponse, settingsResponse] = await Promise.all([
+        const [productsResponse, ordersResponse, categoriesResponse, settings] = await Promise.all([
           axios.get(`${apiUrl}/admin/productos`, adminConfig),
           axios.get(`${apiUrl}/admin/pedidos`, adminConfig),
           axios.get(`${apiUrl}/admin/categorias`, adminConfig),
-          axios.get(`${apiUrl}/admin/configuracion`, adminConfig),
+          loadStoreSettings(adminConfig),
         ]);
 
         setProducts(Array.isArray(productsResponse.data) ? productsResponse.data : []);
         setOrders(Array.isArray(ordersResponse.data) ? ordersResponse.data : []);
         setCategories(Array.isArray(categoriesResponse.data) ? categoriesResponse.data : []);
-        setStoreSettings(settingsResponse.data || {});
+        setStoreSettings(settings);
       } catch (err) {
         console.error("Error al cargar panel admin:", err);
         setAdminError("No se pudieron cargar los datos del panel interno.");
