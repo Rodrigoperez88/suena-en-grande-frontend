@@ -1293,6 +1293,33 @@ img {
   border: 1px solid rgba(146, 109, 82, 0.22);
 }
 
+.order-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.quick-status-btn {
+  flex: 1;
+  min-width: 120px;
+  padding: 11px 14px;
+  border: 0;
+  border-radius: 14px;
+  background: rgba(106, 70, 47, 0.1);
+  color: #624536;
+  font-weight: 800;
+}
+
+.quick-status-btn--success {
+  background: rgba(76, 158, 109, 0.14);
+  color: #2e6c46;
+}
+
+.quick-status-btn:disabled {
+  opacity: 0.62;
+  cursor: not-allowed;
+}
+
 .order-card__details {
   display: grid;
   gap: 8px;
@@ -1614,6 +1641,25 @@ img {
   .order-card__status select {
     min-width: 0;
     width: 100%;
+  }
+
+  .order-card {
+    gap: 12px;
+  }
+
+  .order-card__status span {
+    font-size: 1.35rem;
+  }
+
+  .order-quick-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .quick-status-btn {
+    width: 100%;
+    min-width: 0;
+    padding: 13px 14px;
   }
 
   .order-card__actions,

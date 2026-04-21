@@ -1567,6 +1567,39 @@ export default function App() {
                       </p>
                     </div>
 
+                    <div className="order-quick-actions">
+                      {order.status === "pendiente" ? (
+                        <button
+                          type="button"
+                          className="quick-status-btn"
+                          onClick={() => void updateOrderStatus(order.id, "confirmado")}
+                          disabled={statusSavingId === order.id}
+                        >
+                          Confirmar
+                        </button>
+                      ) : null}
+                      {["pendiente", "confirmado"].includes(order.status) ? (
+                        <button
+                          type="button"
+                          className="quick-status-btn"
+                          onClick={() => void updateOrderStatus(order.id, "en_preparacion")}
+                          disabled={statusSavingId === order.id}
+                        >
+                          Preparar
+                        </button>
+                      ) : null}
+                      {order.status !== "entregado" && order.status !== "cancelado" ? (
+                        <button
+                          type="button"
+                          className="quick-status-btn quick-status-btn--success"
+                          onClick={() => void updateOrderStatus(order.id, "entregado")}
+                          disabled={statusSavingId === order.id}
+                        >
+                          Entregado
+                        </button>
+                      ) : null}
+                    </div>
+
                     <div className="order-card__actions">
                       <button
                         type="button"
