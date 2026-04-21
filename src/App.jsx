@@ -1679,19 +1679,18 @@ export default function App() {
                 </div>
 
                 <div className="field-group">
-                  <label htmlFor="categoryImageFile">Imagen</label>
-                  <input
-                    id="categoryImageFile"
-                    type="file"
-                    accept="image/*"
-                    onChange={(event) => void uploadCategoryImage(event)}
-                    disabled={uploadingCategoryImage}
-                  />
-                  <p className="field-help">
-                    {uploadingCategoryImage
-                      ? "Subiendo imagen..."
-                      : "Se usa como portada de la categoria."}
-                  </p>
+                  <span className="field-label">Imagen</span>
+                  <label className="upload-box" htmlFor="categoryImageFile">
+                    <input
+                      id="categoryImageFile"
+                      type="file"
+                      accept="image/*"
+                      onChange={(event) => void uploadCategoryImage(event)}
+                      disabled={uploadingCategoryImage}
+                    />
+                    <strong>{uploadingCategoryImage ? "Subiendo..." : "Subir imagen"}</strong>
+                    <span>Portada visual de la categoria</span>
+                  </label>
                 </div>
 
                 <div className="field-group field-group--full">
@@ -1709,11 +1708,32 @@ export default function App() {
 
                 {categoryForm.image ? (
                   <div className="field-group field-group--full">
+                    <div className="image-preview__header">
+                      <label>Vista previa de categoria</label>
+                      <button
+                        type="button"
+                        className="text-btn"
+                        onClick={() =>
+                          setCategoryForm((prev) => ({
+                            ...prev,
+                            image: "",
+                          }))
+                        }
+                      >
+                        Quitar imagen
+                      </button>
+                    </div>
                     <div className="image-preview category-preview">
                       <img src={categoryForm.image} alt={categoryForm.name || "Categoria"} />
                     </div>
                   </div>
-                ) : null}
+                ) : (
+                  <div className="field-group field-group--full">
+                    <div className="image-empty-state">
+                      Esta categoria todavia no tiene imagen.
+                    </div>
+                  </div>
+                )}
               </div>
 
               <button
@@ -1873,14 +1893,18 @@ export default function App() {
                 </div>
 
                 <div className="field-group field-group--full">
-                  <label htmlFor="productImageFile">Subir imagen a Cloudinary</label>
-                  <input
-                    id="productImageFile"
-                    type="file"
-                    accept="image/*"
-                    onChange={(event) => void uploadProductImage(event)}
-                    disabled={uploadingImage}
-                  />
+                  <span className="field-label">Subir imagen a Cloudinary</span>
+                  <label className="upload-box upload-box--wide" htmlFor="productImageFile">
+                    <input
+                      id="productImageFile"
+                      type="file"
+                      accept="image/*"
+                      onChange={(event) => void uploadProductImage(event)}
+                      disabled={uploadingImage}
+                    />
+                    <strong>{uploadingImage ? "Subiendo..." : "Elegir imagen"}</strong>
+                    <span>JPG, PNG o WEBP de hasta 5 MB</span>
+                  </label>
                   <p className="field-help">
                     {uploadingImage
                       ? "Subiendo imagen..."
@@ -1909,7 +1933,13 @@ export default function App() {
                       <img src={productForm.image} alt={productForm.name || "Vista previa"} />
                     </div>
                   </div>
-                ) : null}
+                ) : (
+                  <div className="field-group field-group--full">
+                    <div className="image-empty-state">
+                      Este producto todavia no tiene imagen. Subi una foto para que se destaque en la tienda.
+                    </div>
+                  </div>
+                )}
 
                 <div className="field-group field-group--full">
                   <label htmlFor="productDescription">Descripcion</label>

@@ -1098,10 +1098,60 @@ img {
   color: #4d4039;
 }
 
+.field-label {
+  font-size: 0.93rem;
+  font-weight: 700;
+  color: #4d4039;
+}
+
 .field-help {
   margin: 0;
   font-size: 0.9rem;
   color: #655750;
+}
+
+.upload-box {
+  display: grid;
+  gap: 5px;
+  min-height: 94px;
+  place-content: center;
+  padding: 16px;
+  border: 1px dashed rgba(106, 70, 47, 0.34);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 248, 236, 0.72), transparent 42%),
+    rgba(255, 253, 249, 0.8);
+  color: #624536;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    transform 0.18s ease;
+}
+
+.upload-box:hover {
+  border-color: rgba(106, 70, 47, 0.62);
+  background: rgba(255, 248, 240, 0.95);
+  transform: translateY(-1px);
+}
+
+.upload-box input {
+  display: none;
+}
+
+.upload-box strong {
+  color: #3a261c;
+  font-size: 1rem;
+}
+
+.upload-box span {
+  color: #765744;
+  font-size: 0.9rem;
+}
+
+.upload-box--wide {
+  min-height: 112px;
 }
 
 .field-group--full {
@@ -1159,6 +1209,16 @@ img {
 
 .category-preview img {
   max-height: 180px;
+}
+
+.image-empty-state {
+  padding: 18px;
+  border: 1px dashed rgba(106, 70, 47, 0.24);
+  border-radius: 18px;
+  background: rgba(255, 253, 249, 0.64);
+  color: #765744;
+  line-height: 1.5;
+  text-align: center;
 }
 
 .admin-product-card__main {
