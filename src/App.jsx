@@ -15,6 +15,7 @@ const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 const MAX_IMAGE_DIMENSION = 1600;
 const OUTPUT_IMAGE_QUALITY = 0.88;
+const STORE_WHATSAPP_NUMBER = "5491149453115";
 
 const EMPTY_PRODUCT_FORM = {
   id: null,
@@ -72,6 +73,8 @@ export default function App() {
   const [orderMessage, setOrderMessage] = useState("");
   const [orderError, setOrderError] = useState("");
   const [lastOrderId, setLastOrderId] = useState(null);
+  const [lastOrderCustomerName, setLastOrderCustomerName] = useState("");
+  const [lastOrderTotal, setLastOrderTotal] = useState(0);
 
   const [adminLoading, setAdminLoading] = useState(false);
   const [adminError, setAdminError] = useState("");
@@ -387,6 +390,25 @@ export default function App() {
     );
   };
 
+  const openStoreWhatsAppForLastOrder = () => {
+    if (!lastOrderId) {
+      return;
+    }
+
+    const message = [
+      `Hola, hice el pedido #${lastOrderId} en Suena en Grande.`,
+      `Mi nombre es ${lastOrderCustomerName || "cliente"}.`,
+      `Total aproximado: ${formatPrice(lastOrderTotal)}.`,
+      "Quedo atento/a para coordinar entrega y pago.",
+    ].join("\n");
+
+    window.open(
+      `https://wa.me/${STORE_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
+
   const resetCheckout = () => {
     setCheckout({
       customerName: "",
@@ -464,6 +486,8 @@ export default function App() {
     setOrderError("");
     setOrderMessage("");
     setLastOrderId(null);
+    setLastOrderCustomerName("");
+    setLastOrderTotal(0);
   };
 
   const validateCheckout = () => {
@@ -516,6 +540,8 @@ export default function App() {
       const response = await axios.post(`${apiUrl}/pedidos`, payload);
 
       setLastOrderId(response.data.orderId);
+      setLastOrderCustomerName(payload.customerName);
+      setLastOrderTotal(cartTotalAmount);
       setOrderMessage(`Pedido enviado con exito. Numero: #${response.data.orderId}`);
       setCart([]);
       resetCheckout();
@@ -1353,6 +1379,13 @@ export default function App() {
                       onClick={() => scrollToSection("productos")}
                     >
                       Volver al catalogo
+                    </button>
+                    <button
+                      type="button"
+                      className="primary-btn"
+                      onClick={openStoreWhatsAppForLastOrder}
+                    >
+                      Enviar mensaje por WhatsApp
                     </button>
                   </>
                 ) : (
