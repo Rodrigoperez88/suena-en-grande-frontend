@@ -78,6 +78,8 @@ export default function App() {
   const [adminMessage, setAdminMessage] = useState("");
   const [productForm, setProductForm] = useState(createEmptyProductForm);
   const [categoryForm, setCategoryForm] = useState(createEmptyCategoryForm);
+  const [productFormErrors, setProductFormErrors] = useState({});
+  const [categoryFormErrors, setCategoryFormErrors] = useState({});
   const [savingProduct, setSavingProduct] = useState(false);
   const [savingCategory, setSavingCategory] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -549,10 +551,12 @@ export default function App() {
     });
     setAdminMessage("");
     setAdminError("");
+    setProductFormErrors({});
   };
 
   const resetProductForm = () => {
     setProductForm(createEmptyProductForm());
+    setProductFormErrors({});
   };
 
   const startEditingCategory = (category) => {
@@ -563,14 +567,73 @@ export default function App() {
     });
     setAdminMessage("");
     setAdminError("");
+    setCategoryFormErrors({});
   };
 
   const resetCategoryForm = () => {
     setCategoryForm(createEmptyCategoryForm());
+    setCategoryFormErrors({});
+  };
+
+  const updateProductFormField = (field, value) => {
+    setProductForm((prev) => ({ ...prev, [field]: value }));
+    setProductFormErrors((prev) => ({ ...prev, [field]: "" }));
+    setAdminError("");
+  };
+
+  const updateCategoryFormField = (field, value) => {
+    setCategoryForm((prev) => ({ ...prev, [field]: value }));
+    setCategoryFormErrors((prev) => ({ ...prev, [field]: "" }));
+    setAdminError("");
+  };
+
+  const validateCategoryForm = () => {
+    const nextErrors = {};
+
+    if (!categoryForm.name.trim()) {
+      nextErrors.name = "Ingresa el nombre de la categoria.";
+    }
+
+    setCategoryFormErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const validateProductForm = () => {
+    const nextErrors = {};
+    const price = Number(productForm.price);
+    const stock = Number.parseInt(productForm.stock, 10);
+
+    if (!productForm.name.trim()) {
+      nextErrors.name = "Ingresa el nombre del producto.";
+    }
+
+    if (!productForm.category.trim()) {
+      nextErrors.category = "Selecciona una categoria.";
+    }
+
+    if (!Number.isFinite(price) || price < 0) {
+      nextErrors.price = "Ingresa un precio valido.";
+    }
+
+    if (!Number.isInteger(stock) || stock < 0) {
+      nextErrors.stock = "Ingresa un stock valido.";
+    }
+
+    if (!productForm.image.trim()) {
+      nextErrors.image = "Agrega una imagen para publicar el producto.";
+    }
+
+    setProductFormErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
   };
 
   const saveCategory = async () => {
     try {
+      if (!validateCategoryForm()) {
+        setAdminError("Revisa los campos de la categoria antes de guardar.");
+        return;
+      }
+
       setSavingCategory(true);
       setAdminError("");
       setAdminMessage("");
@@ -612,6 +675,11 @@ export default function App() {
 
   const saveProduct = async () => {
     try {
+      if (!validateProductForm()) {
+        setAdminError("Revisa los campos del producto antes de guardar.");
+        return;
+      }
+
       setSavingProduct(true);
       setAdminError("");
       setAdminMessage("");
@@ -776,6 +844,7 @@ export default function App() {
         ...prev,
         image: data.secure_url,
       }));
+      setProductFormErrors((prev) => ({ ...prev, image: "" }));
 
       if (productForm.id) {
         await axios.patch(
@@ -854,6 +923,7 @@ export default function App() {
         ...prev,
         image: data.secure_url,
       }));
+      setCategoryFormErrors((prev) => ({ ...prev, image: "" }));
       setAdminMessage("Imagen subida. Guarda la categoria para publicarla.");
     } catch (err) {
       console.error("Error al subir imagen de categoria a Cloudinary:", err);
@@ -1672,10 +1742,13 @@ export default function App() {
                     type="text"
                     value={categoryForm.name}
                     onChange={(event) =>
-                      setCategoryForm((prev) => ({ ...prev, name: event.target.value }))
+                      updateCategoryFormField("name", event.target.value)
                     }
                     placeholder="Sahumerios, velas, deco..."
                   />
+                  {categoryFormErrors.name ? (
+                    <p className="field-error">{categoryFormErrors.name}</p>
+                  ) : null}
                 </div>
 
                 <div className="field-group">
@@ -1700,7 +1773,7 @@ export default function App() {
                     type="text"
                     value={categoryForm.image}
                     onChange={(event) =>
-                      setCategoryForm((prev) => ({ ...prev, image: event.target.value }))
+                      updateCategoryFormField("image", event.target.value)
                     }
                     placeholder="https://..."
                   />
@@ -1713,12 +1786,13 @@ export default function App() {
                       <button
                         type="button"
                         className="text-btn"
-                        onClick={() =>
+                        onClick={() => {
                           setCategoryForm((prev) => ({
                             ...prev,
                             image: "",
-                          }))
-                        }
+                          }));
+                          setCategoryFormErrors((prev) => ({ ...prev, image: "" }));
+                        }}
                       >
                         Quitar imagen
                       </button>
@@ -1815,10 +1889,13 @@ export default function App() {
                     type="text"
                     value={productForm.name}
                     onChange={(event) =>
-                      setProductForm((prev) => ({ ...prev, name: event.target.value }))
+                      updateProductFormField("name", event.target.value)
                     }
                     placeholder="Nombre del producto"
                   />
+                  {productFormErrors.name ? (
+                    <p className="field-error">{productFormErrors.name}</p>
+                  ) : null}
                 </div>
 
                 <div className="field-group">
@@ -1828,7 +1905,7 @@ export default function App() {
                       id="productCategory"
                       value={productForm.category}
                       onChange={(event) =>
-                        setProductForm((prev) => ({ ...prev, category: event.target.value }))
+                        updateProductFormField("category", event.target.value)
                       }
                     >
                       <option value="">Sin categoria</option>
@@ -1844,11 +1921,14 @@ export default function App() {
                       type="text"
                       value={productForm.category}
                       onChange={(event) =>
-                        setProductForm((prev) => ({ ...prev, category: event.target.value }))
+                        updateProductFormField("category", event.target.value)
                       }
                       placeholder="Primero crea categorias arriba"
                     />
                   )}
+                  {productFormErrors.category ? (
+                    <p className="field-error">{productFormErrors.category}</p>
+                  ) : null}
                 </div>
 
                 <div className="field-group">
@@ -1859,10 +1939,13 @@ export default function App() {
                     min="0"
                     value={productForm.price}
                     onChange={(event) =>
-                      setProductForm((prev) => ({ ...prev, price: event.target.value }))
+                      updateProductFormField("price", event.target.value)
                     }
                     placeholder="0"
                   />
+                  {productFormErrors.price ? (
+                    <p className="field-error">{productFormErrors.price}</p>
+                  ) : null}
                 </div>
 
                 <div className="field-group">
@@ -1873,10 +1956,13 @@ export default function App() {
                     min="0"
                     value={productForm.stock}
                     onChange={(event) =>
-                      setProductForm((prev) => ({ ...prev, stock: event.target.value }))
+                      updateProductFormField("stock", event.target.value)
                     }
                     placeholder="0"
                   />
+                  {productFormErrors.stock ? (
+                    <p className="field-error">{productFormErrors.stock}</p>
+                  ) : null}
                 </div>
 
                 <div className="field-group field-group--full">
@@ -1886,10 +1972,13 @@ export default function App() {
                     type="text"
                     value={productForm.image}
                     onChange={(event) =>
-                      setProductForm((prev) => ({ ...prev, image: event.target.value }))
+                      updateProductFormField("image", event.target.value)
                     }
                     placeholder="https://..."
                   />
+                  {productFormErrors.image ? (
+                    <p className="field-error">{productFormErrors.image}</p>
+                  ) : null}
                 </div>
 
                 <div className="field-group field-group--full">
@@ -1919,12 +2008,13 @@ export default function App() {
                       <button
                         type="button"
                         className="text-btn"
-                        onClick={() =>
+                        onClick={() => {
                           setProductForm((prev) => ({
                             ...prev,
                             image: "",
-                          }))
-                        }
+                          }));
+                          setProductFormErrors((prev) => ({ ...prev, image: "" }));
+                        }}
                       >
                         Quitar imagen
                       </button>
@@ -1948,7 +2038,7 @@ export default function App() {
                     rows="4"
                     value={productForm.description}
                     onChange={(event) =>
-                      setProductForm((prev) => ({ ...prev, description: event.target.value }))
+                      updateProductFormField("description", event.target.value)
                     }
                     placeholder="Describe el producto y su atmosfera"
                   />
