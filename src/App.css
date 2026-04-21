@@ -1728,6 +1728,15 @@ img {
     grid-template-columns: 1fr;
     padding: 12px;
     border-radius: 14px;
+    gap: 12px;
+  }
+
+  .admin-catalog-toolbar .field-group {
+    gap: 6px;
+  }
+
+  .admin-catalog-toolbar .orders-count {
+    width: 100%;
   }
 
   .orders-count {
@@ -1766,6 +1775,8 @@ img {
   .order-card__actions,
   .admin-category-card__actions,
   .admin-product-card__actions {
+    display: grid;
+    grid-template-columns: 1fr;
     justify-content: stretch;
   }
 
@@ -1788,6 +1799,25 @@ img {
   .admin-product-card__thumb {
     width: 58px;
     height: 58px;
+  }
+
+  .admin-product-card {
+    gap: 14px;
+  }
+
+  .admin-product-card__main {
+    grid-template-columns: 64px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .admin-product-card__main > div:last-child {
+    min-width: 0;
+  }
+
+  .admin-product-card h3,
+  .admin-product-card p,
+  .admin-product-card .eyebrow {
+    overflow-wrap: anywhere;
   }
 
   .field-group input,
