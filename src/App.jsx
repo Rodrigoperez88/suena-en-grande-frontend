@@ -88,6 +88,8 @@ export default function App() {
   const [orderStatusFilter, setOrderStatusFilter] = useState("todos");
   const [orderSearch, setOrderSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("todos");
+  const [adminProductSearch, setAdminProductSearch] = useState("");
+  const [adminProductCategoryFilter, setAdminProductCategoryFilter] = useState("todas");
 
   const currencyFormatter = useMemo(() => {
     return new Intl.NumberFormat("es-AR", {
@@ -149,6 +151,28 @@ export default function App() {
         return new Date(secondOrder.createdAt) - new Date(firstOrder.createdAt);
       });
   }, [orderSearch, orderStatusFilter, orders]);
+  const filteredAdminProducts = useMemo(() => {
+    const normalizedSearch = adminProductSearch.trim().toLowerCase();
+
+    return products.filter((product) => {
+      const matchesCategory =
+        adminProductCategoryFilter === "todas" ||
+        (product.category || "Sin categoria") === adminProductCategoryFilter;
+      const searchableText = [
+        product.name,
+        product.description,
+        product.category,
+        product.price,
+        product.stock,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      const matchesSearch = !normalizedSearch || searchableText.includes(normalizedSearch);
+
+      return matchesCategory && matchesSearch;
+    });
+  }, [adminProductCategoryFilter, adminProductSearch, products]);
 
   const getAdminRequestConfig = useCallback(async () => {
     const token = await getToken();
@@ -1750,6 +1774,11 @@ export default function App() {
                 <div>
                   <p className="eyebrow">Catalogo</p>
                   <h2>{productForm.id ? "Editar producto" : "Nuevo producto"}</h2>
+                  {productForm.id ? (
+                    <p className="panel__subcopy">Estas editando un producto existente.</p>
+                  ) : (
+                    <p className="panel__subcopy">Completa los datos para sumarlo a la tienda.</p>
+                  )}
                 </div>
                 {productForm.id ? (
                   <button type="button" className="secondary-btn" onClick={resetProductForm}>
@@ -1918,46 +1947,97 @@ export default function App() {
                 </div>
               </div>
 
+              <div className="admin-catalog-toolbar">
+                <div className="field-group">
+                  <label htmlFor="adminProductSearch">Buscar producto</label>
+                  <input
+                    id="adminProductSearch"
+                    type="text"
+                    value={adminProductSearch}
+                    onChange={(event) => setAdminProductSearch(event.target.value)}
+                    placeholder="Nombre, descripcion o precio"
+                  />
+                </div>
+
+                <div className="field-group">
+                  <label htmlFor="adminProductCategoryFilter">Categoria</label>
+                  <select
+                    id="adminProductCategoryFilter"
+                    value={adminProductCategoryFilter}
+                    onChange={(event) => setAdminProductCategoryFilter(event.target.value)}
+                  >
+                    <option value="todas">Todas</option>
+                    <option value="Sin categoria">Sin categoria</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.name}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="orders-count">
+                  <span>Productos</span>
+                  <strong>{filteredAdminProducts.length}</strong>
+                </div>
+              </div>
+
               <div className="admin-products">
-                {products.map((product) => (
-                  <article className="admin-product-card" key={product.id}>
-                    <div className="admin-product-card__main">
-                      <div className="admin-product-card__thumb">
-                        {product.image ? (
-                          <img src={product.image} alt={product.name} />
-                        ) : (
-                          <span>{product.category?.slice(0, 1) || "P"}</span>
-                        )}
-                      </div>
+                {filteredAdminProducts.length === 0 ? (
+                  <div className="empty-state empty-state--soft">
+                    <h3>No encontramos productos</h3>
+                    <p>Proba cambiar la busqueda o el filtro de categoria.</p>
+                  </div>
+                ) : (
+                  filteredAdminProducts.map((product) => {
+                    const productStock = Number(product.stock || 0);
 
-                      <div>
-                        <p className="eyebrow eyebrow--compact">
-                          {product.category || "Sin categoria"}
-                        </p>
-                        <h3>{product.name}</h3>
-                        <p>{formatPrice(product.price)} - Stock {product.stock}</p>
-                      </div>
-                    </div>
+                    return (
+                      <article className="admin-product-card" key={product.id}>
+                        <div className="admin-product-card__main">
+                          <div className="admin-product-card__thumb">
+                            {product.image ? (
+                              <img src={product.image} alt={product.name} />
+                            ) : (
+                              <span>{product.category?.slice(0, 1) || "P"}</span>
+                            )}
+                          </div>
 
-                    <div className="admin-product-card__actions">
-                      <button
-                        type="button"
-                        className="secondary-btn"
-                        onClick={() => startEditingProduct(product)}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        type="button"
-                        className="danger-btn"
-                        onClick={() => void deleteProduct(product.id)}
-                        disabled={deletingProductId === product.id}
-                      >
-                        {deletingProductId === product.id ? "Eliminando..." : "Eliminar"}
-                      </button>
-                    </div>
-                  </article>
-                ))}
+                          <div>
+                            <p className="eyebrow eyebrow--compact">
+                              {product.category || "Sin categoria"}
+                            </p>
+                            <h3>{product.name}</h3>
+                            <p>{formatPrice(product.price)} - Stock {product.stock}</p>
+                            <div className="admin-product-flags">
+                              {!product.image ? <span>Sin imagen</span> : null}
+                              {productStock === 0 ? <span>Sin stock</span> : null}
+                              {productStock > 0 && productStock <= 3 ? <span>Stock bajo</span> : null}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="admin-product-card__actions">
+                          <button
+                            type="button"
+                            className="secondary-btn"
+                            onClick={() => startEditingProduct(product)}
+                          >
+                            Editar
+                          </button>
+                          <button
+                            type="button"
+                            className="danger-btn"
+                            onClick={() => void deleteProduct(product.id)}
+                            disabled={deletingProductId === product.id}
+                          >
+                            {deletingProductId === product.id ? "Eliminando..." : "Eliminar"}
+                          </button>
+                        </div>
+                      </article>
+                    );
+                  })
+                )}
               </div>
             </div>
           </section>

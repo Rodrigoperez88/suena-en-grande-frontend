@@ -572,6 +572,12 @@ img {
   text-align: right;
 }
 
+.panel__subcopy {
+  margin: 8px 0 0;
+  color: #765744;
+  line-height: 1.45;
+}
+
 .eyebrow {
   margin: 0 0 8px;
   color: #a06f4d;
@@ -959,6 +965,18 @@ img {
   border: 1px solid rgba(151, 111, 81, 0.12);
 }
 
+.admin-catalog-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(160px, 0.7fr) 120px;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid rgba(106, 70, 47, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 253, 249, 0.72);
+}
+
 .orders-count {
   display: grid;
   gap: 4px;
@@ -1173,6 +1191,23 @@ img {
   color: #8a6046;
   font-size: 1.2rem;
   font-weight: 700;
+}
+
+.admin-product-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.admin-product-flags span {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: rgba(174, 67, 61, 0.1);
+  color: #8c312d;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
 }
 
 .field-error,
@@ -1624,6 +1659,12 @@ img {
   }
 
   .orders-toolbar {
+    grid-template-columns: 1fr;
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .admin-catalog-toolbar {
     grid-template-columns: 1fr;
     padding: 12px;
     border-radius: 14px;
