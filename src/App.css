@@ -967,14 +967,18 @@ img {
 
 .admin-catalog-toolbar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(160px, 0.7fr) 120px;
+  grid-template-columns: 1fr;
   gap: 12px;
-  align-items: end;
+  align-items: stretch;
   margin-bottom: 16px;
   padding: 14px;
   border: 1px solid rgba(106, 70, 47, 0.12);
   border-radius: 18px;
   background: rgba(255, 253, 249, 0.72);
+}
+
+.admin-catalog-toolbar .orders-count {
+  width: 100%;
 }
 
 .orders-count {
