@@ -39,7 +39,9 @@ img {
 
 #inicio,
 #productos,
-#contacto {
+#contacto,
+#adminCategoryForm,
+#adminProductForm {
   scroll-margin-top: 120px;
 }
 

@@ -58,6 +58,7 @@ export default function App() {
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [storeSettings, setStoreSettings] = useState({});
   const [orders, setOrders] = useState([]);
   const [cart, setCart] = useState([]);
 
@@ -87,6 +88,8 @@ export default function App() {
   const [savingCategory, setSavingCategory] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingCategoryImage, setUploadingCategoryImage] = useState(false);
+  const [uploadingHeroImage, setUploadingHeroImage] = useState(false);
+  const [savingStoreSettings, setSavingStoreSettings] = useState(false);
   const [statusSavingId, setStatusSavingId] = useState(null);
   const [deletingProductId, setDeletingProductId] = useState(null);
   const [deletingCategoryId, setDeletingCategoryId] = useState(null);
@@ -195,15 +198,17 @@ export default function App() {
         setLoading(true);
         setError("");
 
-        const [healthResponse, productsResponse, categoriesResponse] = await Promise.all([
+        const [healthResponse, productsResponse, categoriesResponse, settingsResponse] = await Promise.all([
           axios.get(`${apiUrl}/`),
           axios.get(`${apiUrl}/productos`),
           axios.get(`${apiUrl}/categorias`),
+          axios.get(`${apiUrl}/configuracion`),
         ]);
 
         setApiMessage(healthResponse.data.message || "");
         setProducts(Array.isArray(productsResponse.data) ? productsResponse.data : []);
         setCategories(Array.isArray(categoriesResponse.data) ? categoriesResponse.data : []);
+        setStoreSettings(settingsResponse.data || {});
       } catch (err) {
         console.error("Error al cargar tienda:", err);
         setError("No se pudo conectar con el backend.");
@@ -231,15 +236,17 @@ export default function App() {
       setAdminError("");
       const adminConfig = await getAdminRequestConfig();
 
-      const [productsResponse, ordersResponse, categoriesResponse] = await Promise.all([
+      const [productsResponse, ordersResponse, categoriesResponse, settingsResponse] = await Promise.all([
         axios.get(`${apiUrl}/admin/productos`, adminConfig),
         axios.get(`${apiUrl}/admin/pedidos`, adminConfig),
         axios.get(`${apiUrl}/admin/categorias`, adminConfig),
+        axios.get(`${apiUrl}/admin/configuracion`, adminConfig),
       ]);
 
       setProducts(Array.isArray(productsResponse.data) ? productsResponse.data : []);
       setOrders(Array.isArray(ordersResponse.data) ? ordersResponse.data : []);
       setCategories(Array.isArray(categoriesResponse.data) ? categoriesResponse.data : []);
+      setStoreSettings(settingsResponse.data || {});
     } catch (err) {
       console.error("Error al cargar panel admin:", err);
       setAdminError("No se pudieron cargar los datos del panel interno.");
@@ -263,15 +270,17 @@ export default function App() {
         setAdminError("");
         const adminConfig = await getAdminRequestConfig();
 
-        const [productsResponse, ordersResponse, categoriesResponse] = await Promise.all([
+        const [productsResponse, ordersResponse, categoriesResponse, settingsResponse] = await Promise.all([
           axios.get(`${apiUrl}/admin/productos`, adminConfig),
           axios.get(`${apiUrl}/admin/pedidos`, adminConfig),
           axios.get(`${apiUrl}/admin/categorias`, adminConfig),
+          axios.get(`${apiUrl}/admin/configuracion`, adminConfig),
         ]);
 
         setProducts(Array.isArray(productsResponse.data) ? productsResponse.data : []);
         setOrders(Array.isArray(ordersResponse.data) ? ordersResponse.data : []);
         setCategories(Array.isArray(categoriesResponse.data) ? categoriesResponse.data : []);
+        setStoreSettings(settingsResponse.data || {});
       } catch (err) {
         console.error("Error al cargar panel admin:", err);
         setAdminError("No se pudieron cargar los datos del panel interno.");
@@ -578,6 +587,12 @@ export default function App() {
     setAdminMessage("");
     setAdminError("");
     setProductFormErrors({});
+    window.requestAnimationFrame(() => {
+      document.getElementById("adminProductForm")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
   };
 
   const resetProductForm = () => {
@@ -594,6 +609,12 @@ export default function App() {
     setAdminMessage("");
     setAdminError("");
     setCategoryFormErrors({});
+    window.requestAnimationFrame(() => {
+      document.getElementById("adminCategoryForm")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
   };
 
   const resetCategoryForm = () => {
@@ -1754,7 +1775,7 @@ export default function App() {
           </section>
 
           <section className="admin-side">
-            <div className="panel">
+            <div className="panel" id="adminCategoryForm">
               <div className="panel__header">
                 <div>
                   <p className="eyebrow">Categorias</p>
@@ -1896,7 +1917,7 @@ export default function App() {
               ) : null}
             </div>
 
-            <div className="panel">
+            <div className="panel" id="adminProductForm">
               <div className="panel__header">
                 <div>
                   <p className="eyebrow">Catalogo</p>
