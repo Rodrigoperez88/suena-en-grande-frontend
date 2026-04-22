@@ -998,6 +998,104 @@ export default function App() {
     }
   };
 
+  const saveStoreSettings = async (nextSettings = storeSettings) => {
+    try {
+      setSavingStoreSettings(true);
+      setAdminError("");
+      setAdminMessage("");
+
+      const response = await axios.patch(
+        `${apiUrl}/admin/configuracion`,
+        {
+          heroImage: nextSettings.heroImage || "",
+        },
+        await getAdminRequestConfig()
+      );
+
+      setStoreSettings((prev) => ({
+        ...prev,
+        ...(response.data.settings || nextSettings),
+      }));
+      setAdminMessage("Portada actualizada correctamente.");
+    } catch (err) {
+      console.error("Error al guardar configuracion:", err);
+      setAdminError(
+        err?.response?.data?.error ||
+          err?.response?.data?.detalle ||
+          "No se pudo guardar la portada."
+      );
+    } finally {
+      setSavingStoreSettings(false);
+    }
+  };
+
+  const uploadHeroImage = async (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      setAdminError("Formato no permitido. Usa JPG, PNG o WEBP.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      setAdminError("La imagen supera los 5 MB. Elige un archivo mas liviano.");
+      event.target.value = "";
+      return;
+    }
+
+    if (!cloudinaryCloudName || !cloudinaryUploadPreset) {
+      setAdminError(
+        "Faltan las variables de Cloudinary. Configura VITE_CLOUDINARY_CLOUD_NAME y VITE_CLOUDINARY_UPLOAD_PRESET."
+      );
+      event.target.value = "";
+      return;
+    }
+
+    try {
+      setUploadingHeroImage(true);
+      setAdminError("");
+      setAdminMessage("");
+
+      const optimizedFile = await resizeImageFile(file);
+      const formData = new FormData();
+      formData.append("file", optimizedFile);
+      formData.append("upload_preset", cloudinaryUploadPreset);
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.secure_url) {
+        throw new Error(data?.error?.message || "No se pudo subir la imagen");
+      }
+
+      const nextSettings = {
+        ...storeSettings,
+        heroImage: data.secure_url,
+      };
+
+      setStoreSettings(nextSettings);
+      await saveStoreSettings(nextSettings);
+    } catch (err) {
+      console.error("Error al subir imagen de portada a Cloudinary:", err);
+      setAdminError(err.message || "No se pudo subir la imagen.");
+    } finally {
+      setUploadingHeroImage(false);
+      event.target.value = "";
+    }
+  };
+
   const deleteProduct = async (productId) => {
     try {
       setDeletingProductId(productId);
@@ -1082,6 +1180,7 @@ export default function App() {
   };
 
   const featuredHeroProduct = products.find((product) => product.image) || products[0];
+  const heroImage = storeSettings.heroImage || featuredHeroProduct?.image || "";
   const categoryItems = categories.length > 0
     ? categories
     : [
@@ -1181,8 +1280,8 @@ export default function App() {
         </div>
 
         <div className="hero__visual" aria-label="Ambiente calido de la tienda">
-          {featuredHeroProduct?.image ? (
-            <img src={featuredHeroProduct.image} alt={featuredHeroProduct.name} />
+          {heroImage ? (
+            <img src={heroImage} alt="Portada de Suena en Grande" />
           ) : (
             <div className="hero__visual-fallback">
               <span>Sueña</span>
@@ -1191,7 +1290,7 @@ export default function App() {
           )}
           <div className="hero__floating-card">
             <span>Seleccion especial</span>
-            <strong>{featuredHeroProduct?.category || "Aromas y hogar"}</strong>
+            <strong>{storeSettings.heroImage ? "Portada de tienda" : featuredHeroProduct?.category || "Aromas y hogar"}</strong>
           </div>
         </div>
 
@@ -1792,6 +1891,86 @@ export default function App() {
           </section>
 
           <section className="admin-side">
+            <div className="panel">
+              <div className="panel__header">
+                <div>
+                  <p className="eyebrow">Portada</p>
+                  <h2>Imagen principal</h2>
+                  <p className="panel__subcopy">
+                    Esta imagen aparece arriba de la tienda, en el bloque principal.
+                  </p>
+                </div>
+              </div>
+
+              <div className="form-grid">
+                <div className="field-group field-group--full">
+                  <span className="field-label">Subir portada</span>
+                  <label className="upload-box upload-box--wide" htmlFor="heroImageFile">
+                    <input
+                      id="heroImageFile"
+                      type="file"
+                      accept="image/*"
+                      onChange={(event) => void uploadHeroImage(event)}
+                      disabled={uploadingHeroImage || savingStoreSettings}
+                    />
+                    <strong>{uploadingHeroImage ? "Subiendo..." : "Elegir imagen"}</strong>
+                    <span>Ideal horizontal, con buena luz y productos de la marca</span>
+                  </label>
+                </div>
+
+                <div className="field-group field-group--full">
+                  <label htmlFor="heroImage">URL de portada</label>
+                  <input
+                    id="heroImage"
+                    type="text"
+                    value={storeSettings.heroImage || ""}
+                    onChange={(event) =>
+                      setStoreSettings((prev) => ({ ...prev, heroImage: event.target.value }))
+                    }
+                    placeholder="https://..."
+                  />
+                </div>
+
+                {storeSettings.heroImage ? (
+                  <div className="field-group field-group--full">
+                    <div className="image-preview__header">
+                      <label>Vista previa de portada</label>
+                      <button
+                        type="button"
+                        className="text-btn"
+                        onClick={() => {
+                          const nextSettings = { ...storeSettings, heroImage: "" };
+                          setStoreSettings(nextSettings);
+                          void saveStoreSettings(nextSettings);
+                        }}
+                        disabled={savingStoreSettings}
+                      >
+                        Quitar portada
+                      </button>
+                    </div>
+                    <div className="image-preview hero-preview">
+                      <img src={storeSettings.heroImage} alt="Vista previa de portada" />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="field-group field-group--full">
+                    <div className="image-empty-state">
+                      Todavia no hay portada personalizada. Mientras tanto se usa la primera imagen de producto.
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <button
+                type="button"
+                className="primary-btn primary-btn--full"
+                onClick={() => void saveStoreSettings()}
+                disabled={savingStoreSettings || uploadingHeroImage}
+              >
+                {savingStoreSettings ? "Guardando portada..." : "Guardar portada"}
+              </button>
+            </div>
+
             <div className="panel" id="adminCategoryForm">
               <div className="panel__header">
                 <div>
