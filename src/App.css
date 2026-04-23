@@ -124,6 +124,36 @@ img {
   gap: 12px;
 }
 
+.social-links {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.social-links a {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 999px;
+  color: #5f5d55;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.social-links a:hover {
+  background: rgba(106, 70, 47, 0.1);
+  color: #3a261c;
+  transform: translateY(-1px);
+}
+
 .cart-chip {
   display: inline-flex;
   align-items: center;
@@ -1557,6 +1587,12 @@ img {
   .store-header__actions {
     max-width: 100%;
     flex-wrap: wrap;
+  }
+
+  .social-links {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .cart-chip {

@@ -1250,6 +1250,17 @@ export default function App() {
         </nav>
 
         <div className="store-header__actions">
+          <div className="social-links" aria-label="Redes sociales">
+            <a href="#" aria-label="Facebook">
+              f
+            </a>
+            <a href="#" aria-label="X">
+              X
+            </a>
+            <a href="#" aria-label="Pinterest">
+              p
+            </a>
+          </div>
           {isAdminUser ? <UserButton /> : null}
           <button type="button" className="cart-chip" onClick={() => setActiveView("shop")}>
             Carrito <strong>{cartTotalQuantity}</strong>
