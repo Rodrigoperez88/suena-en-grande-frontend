@@ -66,6 +66,22 @@ img {
   mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent 78%);
 }
 
+.site-footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 28px;
+  padding: 20px 0 4px;
+  border-top: 1px solid rgba(106, 70, 47, 0.18);
+  color: #765744;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 .top-strip {
   position: relative;
   z-index: 3;
@@ -1587,6 +1603,13 @@ img {
   .store-header__actions {
     max-width: 100%;
     flex-wrap: wrap;
+  }
+
+  .site-footer {
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
   }
 
   .social-links {

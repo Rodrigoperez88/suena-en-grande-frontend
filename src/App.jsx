@@ -2425,6 +2425,11 @@ export default function App() {
           </main>
         </SignedIn>
       ) : null}
+
+      <footer className="site-footer">
+        <span>© {new Date().getFullYear()} Rodrigo Perez</span>
+        <span>Sueña en Grande</span>
+      </footer>
     </div>
   );
 }
