@@ -194,6 +194,7 @@ img {
 
 .hero {
   position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: minmax(0, 0.92fr) minmax(320px, 0.58fr);
   align-items: stretch;
@@ -210,6 +211,21 @@ img {
     linear-gradient(115deg, rgba(255, 247, 238, 0.96), rgba(249, 224, 199, 0.78)),
     #fff1e4;
   box-shadow: 0 24px 70px rgba(83, 48, 30, 0.12);
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background-image:
+    linear-gradient(rgba(34, 22, 16, 0.26), rgba(34, 22, 16, 0.18)),
+    url("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnhic2R6YnF6amZ4bmZ4bmZ4bmZ4bmZ4bmZ4bmZ4bmZ4bmZ4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKMGpxxcaOQI6U8/giphy.gif");
+  background-position: center;
+  background-size: cover;
+  opacity: 0.16;
+  filter: saturate(0.72) sepia(0.12);
 }
 
 .hero::after {
