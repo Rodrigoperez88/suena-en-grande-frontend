@@ -98,6 +98,7 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState("todos");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [adminSection, setAdminSection] = useState("orders");
+  const [adminCatalogSection, setAdminCatalogSection] = useState("hero");
   const [adminProductSearch, setAdminProductSearch] = useState("");
   const [adminProductCategoryFilter, setAdminProductCategoryFilter] = useState("todas");
 
@@ -616,6 +617,8 @@ export default function App() {
   };
 
   const startEditingProduct = (product) => {
+    setAdminSection("catalog");
+    setAdminCatalogSection("products");
     setProductForm({
       id: product.id,
       name: product.name || "",
@@ -642,6 +645,8 @@ export default function App() {
   };
 
   const startEditingCategory = (category) => {
+    setAdminSection("catalog");
+    setAdminCatalogSection("categories");
     setCategoryForm({
       id: category.id,
       name: category.name || "",
@@ -2001,7 +2006,31 @@ export default function App() {
           </section> : null}
 
           {adminSection === "catalog" ? <section className="admin-side">
-            <div className="panel">
+            <div className="admin-subsection-switcher">
+              <button
+                type="button"
+                className={adminCatalogSection === "hero" ? "view-switcher__btn is-active" : "view-switcher__btn"}
+                onClick={() => setAdminCatalogSection("hero")}
+              >
+                Portada
+              </button>
+              <button
+                type="button"
+                className={adminCatalogSection === "categories" ? "view-switcher__btn is-active" : "view-switcher__btn"}
+                onClick={() => setAdminCatalogSection("categories")}
+              >
+                Categorias
+              </button>
+              <button
+                type="button"
+                className={adminCatalogSection === "products" ? "view-switcher__btn is-active" : "view-switcher__btn"}
+                onClick={() => setAdminCatalogSection("products")}
+              >
+                Productos
+              </button>
+            </div>
+
+            {adminCatalogSection === "hero" ? <div className="panel">
               <div className="panel__header">
                 <div>
                   <p className="eyebrow">Portada</p>
@@ -2079,9 +2108,9 @@ export default function App() {
               >
                 {savingStoreSettings ? "Guardando portada..." : "Guardar portada"}
               </button>
-            </div>
+            </div> : null}
 
-            <div className="panel" id="adminCategoryForm">
+            {adminCatalogSection === "categories" ? <div className="panel" id="adminCategoryForm">
               <div className="panel__header">
                 <div>
                   <p className="eyebrow">Categorias</p>
@@ -2221,9 +2250,9 @@ export default function App() {
                   ))}
                 </div>
               ) : null}
-            </div>
+            </div> : null}
 
-            <div className="panel" id="adminProductForm">
+            {adminCatalogSection === "products" ? <div className="panel" id="adminProductForm">
               <div className="panel__header">
                 <div>
                   <p className="eyebrow">Catalogo</p>
@@ -2417,9 +2446,9 @@ export default function App() {
                     ? "Actualizar producto"
                     : "Crear producto"}
               </button>
-            </div>
+            </div> : null}
 
-            <div className="panel">
+            {adminCatalogSection === "products" ? <div className="panel">
               <div className="panel__header">
                 <div>
                   <p className="eyebrow">Stock actual</p>
@@ -2519,7 +2548,7 @@ export default function App() {
                   })
                 )}
               </div>
-            </div>
+            </div> : null}
           </section> : null}
           </main>
         </SignedIn>
