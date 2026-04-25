@@ -551,6 +551,7 @@ img {
   background: rgba(255, 248, 240, 0.88);
   border: 1px solid rgba(106, 70, 47, 0.14);
   backdrop-filter: blur(10px);
+  grid-column: 1 / -1;
 }
 
 .admin-side {
@@ -558,6 +559,11 @@ img {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 22px;
   align-items: start;
+  grid-column: 1 / -1;
+}
+
+.admin-layout > .panel {
+  grid-column: 1 / -1;
 }
 
 .admin-side > .panel:first-child,
