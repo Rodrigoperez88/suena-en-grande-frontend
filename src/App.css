@@ -1,12 +1,27 @@
 :root {
   color: #2f2119;
   background:
-    linear-gradient(180deg, rgba(251, 241, 230, 0.92), rgba(243, 220, 199, 0.88) 52%, rgba(236, 210, 187, 0.94)),
+    linear-gradient(-45deg, rgba(245, 235, 224, 0.9), rgba(227, 213, 202, 0.88), rgba(213, 189, 175, 0.86), rgba(237, 237, 233, 0.9)),
     url("https://res.cloudinary.com/dfetskjy0/image/upload/v1776705932/HgDn10BVX_1256x620__1_nriyzo.jpg");
   background-attachment: fixed;
-  background-position: center top;
-  background-size: cover;
+  background-position: 0% 50%, center top;
+  background-size: 400% 400%, cover;
+  animation: page-gradient 15s ease infinite;
   font-family: Georgia, "Times New Roman", serif;
+}
+
+@keyframes page-gradient {
+  0% {
+    background-position: 0% 50%, center top;
+  }
+
+  50% {
+    background-position: 100% 50%, center top;
+  }
+
+  100% {
+    background-position: 0% 50%, center top;
+  }
 }
 
 * {
