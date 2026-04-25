@@ -8,6 +8,9 @@
   background-size: 400% 400%, cover;
   animation: page-gradient 15s ease infinite;
   font-family: Georgia, "Times New Roman", serif;
+  --soft-buddha-bg:
+    linear-gradient(rgba(255, 250, 245, 0.9), rgba(255, 248, 241, 0.9)),
+    url("https://www.portalmindfulness.com/wp-content/uploads/buddha-2978269_1280-750x375.jpg");
 }
 
 @keyframes page-gradient {
@@ -615,7 +618,9 @@ img {
 .panel {
   padding: 28px;
   border-radius: 28px;
-  background: rgba(255, 250, 245, 0.92);
+  background: var(--soft-buddha-bg);
+  background-size: cover;
+  background-position: center;
   border: 1px solid rgba(106, 70, 47, 0.13);
   box-shadow: 0 18px 48px rgba(83, 48, 30, 0.07);
   backdrop-filter: blur(8px);
@@ -887,7 +892,9 @@ img {
   border: 1px solid rgba(106, 70, 47, 0.12);
   border-radius: 24px;
   overflow: hidden;
-  background: #fff;
+  background: var(--soft-buddha-bg);
+  background-size: cover;
+  background-position: center;
 }
 
 .store-benefits article {
@@ -895,7 +902,7 @@ img {
   border: 0;
   border-right: 1px solid rgba(106, 70, 47, 0.12);
   border-radius: 0;
-  background: #fff;
+  background: rgba(255, 252, 248, 0.76);
 }
 
 .store-benefits article:last-child {
