@@ -10,7 +10,7 @@
   font-family: Georgia, "Times New Roman", serif;
   --soft-buddha-bg:
     linear-gradient(rgba(255, 250, 245, 0.9), rgba(255, 248, 241, 0.9)),
-    url("https://www.portalmindfulness.com/wp-content/uploads/buddha-2978269_1280-750x375.jpg");
+    url("https://res.cloudinary.com/dfetskjy0/image/upload/v1777154193/budi_q4obyc.webp");
 }
 
 @keyframes page-gradient {
