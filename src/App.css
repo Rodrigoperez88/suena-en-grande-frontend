@@ -555,7 +555,14 @@ img {
 
 .admin-side {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 22px;
+  align-items: start;
+}
+
+.admin-side > .panel:first-child,
+.admin-side > .panel:last-child {
+  grid-column: 1 / -1;
 }
 
 .admin-categories {
@@ -1817,6 +1824,15 @@ img {
   .shop-layout,
   .admin-layout {
     grid-template-columns: 1fr;
+  }
+
+  .admin-side {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-side > .panel:first-child,
+  .admin-side > .panel:last-child {
+    grid-column: auto;
   }
 
   .metrics-grid {
