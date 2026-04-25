@@ -875,14 +875,27 @@ img {
 }
 
 .category-showcase {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
+  position: relative;
+  overflow: hidden;
   margin: -4px 0 28px;
+  mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+}
+
+.category-showcase__track {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  width: max-content;
+  animation: category-marquee 34s linear infinite;
+}
+
+.category-showcase:hover .category-showcase__track {
+  animation-play-state: paused;
 }
 
 .category-item {
   display: grid;
+  flex: 0 0 208px;
   gap: 9px;
   padding: 0 0 14px;
   overflow: hidden;
@@ -893,19 +906,29 @@ img {
   text-align: left;
   min-width: 0;
   transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    border-color 0.18s ease;
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease,
+    filter 0.22s ease;
 }
 
 .category-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(83, 55, 37, 0.08);
+  transform: translateY(-6px) scale(1.06);
+  box-shadow: 0 22px 34px rgba(83, 55, 37, 0.15);
+  z-index: 2;
+}
+
+.category-showcase:hover .category-item:not(:hover) {
+  filter: saturate(0.9);
 }
 
 .category-item--active {
   border-color: rgba(106, 70, 47, 0.34);
   box-shadow: 0 16px 34px rgba(83, 48, 30, 0.1);
+}
+
+.category-item--duplicate {
+  pointer-events: none;
 }
 
 .category-item__image {
@@ -947,6 +970,16 @@ img {
 .category-item small {
   color: #7a6254;
   font-weight: 700;
+}
+
+@keyframes category-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-50% - 8px));
+  }
 }
 
 .cart-panel {
@@ -1705,8 +1738,21 @@ img {
   }
 
   .category-showcase {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-bottom: 22px;
+    mask-image: none;
+    overflow-x: auto;
+    overflow-y: visible;
+    padding-bottom: 6px;
+    scrollbar-width: none;
+  }
+
+  .category-showcase::-webkit-scrollbar {
+    display: none;
+  }
+
+  .category-showcase__track {
     gap: 12px;
+    animation: none;
   }
 
   .product-grid {
@@ -1714,6 +1760,7 @@ img {
   }
 
   .category-item {
+    flex-basis: 164px;
     padding-bottom: 12px;
   }
 
@@ -1914,9 +1961,12 @@ img {
 }
 
 @media (max-width: 380px) {
-  .category-showcase,
   .product-grid,
   .metrics-grid {
     grid-template-columns: 1fr;
+  }
+
+  .category-item {
+    flex-basis: 148px;
   }
 }

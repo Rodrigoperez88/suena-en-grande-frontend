@@ -1367,47 +1367,87 @@ export default function App() {
 
             {categoryItems.length > 0 ? (
               <div className="category-showcase" aria-label="Categorias del catalogo">
-                <button
-                  type="button"
-                  className={
-                    selectedCategory === "todos"
-                      ? "category-item category-item--active"
-                      : "category-item"
-                  }
-                  onClick={() => setSelectedCategory("todos")}
-                >
-                  <span className="category-item__image category-item__image--all">Todo</span>
-                  <strong>Todas</strong>
-                  <small>{products.length} productos</small>
-                </button>
-                {categoryItems.map((category) => {
-                  const categoryProductsCount = products.filter(
-                    (product) => product.category === category.name
-                  ).length;
+                <div className="category-showcase__track">
+                  <button
+                    type="button"
+                    className={
+                      selectedCategory === "todos"
+                        ? "category-item category-item--active"
+                        : "category-item"
+                    }
+                    onClick={() => setSelectedCategory("todos")}
+                  >
+                    <span className="category-item__image category-item__image--all">Todo</span>
+                    <strong>Todas</strong>
+                    <small>{products.length} productos</small>
+                  </button>
+                  {categoryItems.map((category) => {
+                    const categoryProductsCount = products.filter(
+                      (product) => product.category === category.name
+                    ).length;
 
-                  return (
-                    <button
-                      type="button"
-                      className={
-                        selectedCategory === category.name
-                          ? "category-item category-item--active"
-                          : "category-item"
-                      }
-                      key={category.id}
-                      onClick={() => setSelectedCategory(category.name)}
-                    >
-                      <span className="category-item__image">
-                        {category.image ? (
-                          <img src={category.image} alt={category.name} />
-                        ) : (
-                          category.name.slice(0, 1)
-                        )}
-                      </span>
-                      <strong>{category.name}</strong>
-                      <small>{categoryProductsCount} productos</small>
-                    </button>
-                  );
-                })}
+                    return (
+                      <button
+                        type="button"
+                        className={
+                          selectedCategory === category.name
+                            ? "category-item category-item--active"
+                            : "category-item"
+                        }
+                        key={category.id}
+                        onClick={() => setSelectedCategory(category.name)}
+                      >
+                        <span className="category-item__image">
+                          {category.image ? (
+                            <img src={category.image} alt={category.name} />
+                          ) : (
+                            category.name.slice(0, 1)
+                          )}
+                        </span>
+                        <strong>{category.name}</strong>
+                        <small>{categoryProductsCount} productos</small>
+                      </button>
+                    );
+                  })}
+
+                  <button
+                    type="button"
+                    className="category-item category-item--duplicate"
+                    onClick={() => setSelectedCategory("todos")}
+                    aria-hidden="true"
+                    tabIndex={-1}
+                  >
+                    <span className="category-item__image category-item__image--all">Todo</span>
+                    <strong>Todas</strong>
+                    <small>{products.length} productos</small>
+                  </button>
+                  {categoryItems.map((category) => {
+                    const categoryProductsCount = products.filter(
+                      (product) => product.category === category.name
+                    ).length;
+
+                    return (
+                      <button
+                        type="button"
+                        className="category-item category-item--duplicate"
+                        key={`duplicate-${category.id}`}
+                        onClick={() => setSelectedCategory(category.name)}
+                        aria-hidden="true"
+                        tabIndex={-1}
+                      >
+                        <span className="category-item__image">
+                          {category.image ? (
+                            <img src={category.image} alt="" />
+                          ) : (
+                            category.name.slice(0, 1)
+                          )}
+                        </span>
+                        <strong>{category.name}</strong>
+                        <small>{categoryProductsCount} productos</small>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             ) : null}
 
