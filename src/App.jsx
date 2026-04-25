@@ -97,6 +97,7 @@ export default function App() {
   const [orderSearch, setOrderSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("todos");
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [adminSection, setAdminSection] = useState("orders");
   const [adminProductSearch, setAdminProductSearch] = useState("");
   const [adminProductCategoryFilter, setAdminProductCategoryFilter] = useState("todas");
 
@@ -1799,8 +1800,24 @@ export default function App() {
 
       {!loading && !error && activeView === "admin" && isAdminUser ? (
         <SignedIn>
-          <main className="admin-layout">
-          <section className="panel">
+          <main className={adminSection === "orders" ? "admin-layout admin-layout--single" : "admin-layout"}>
+          <div className="admin-section-switcher">
+            <button
+              type="button"
+              className={adminSection === "orders" ? "view-switcher__btn is-active" : "view-switcher__btn"}
+              onClick={() => setAdminSection("orders")}
+            >
+              Pedidos
+            </button>
+            <button
+              type="button"
+              className={adminSection === "catalog" ? "view-switcher__btn is-active" : "view-switcher__btn"}
+              onClick={() => setAdminSection("catalog")}
+            >
+              Catalogo y contenido
+            </button>
+          </div>
+          {adminSection === "orders" ? <section className="panel">
             <div className="panel__header">
               <div>
                 <p className="eyebrow">Panel interno</p>
@@ -1981,9 +1998,9 @@ export default function App() {
                 ))}
               </div>
             )}
-          </section>
+          </section> : null}
 
-          <section className="admin-side">
+          {adminSection === "catalog" ? <section className="admin-side">
             <div className="panel">
               <div className="panel__header">
                 <div>
@@ -2503,7 +2520,7 @@ export default function App() {
                 )}
               </div>
             </div>
-          </section>
+          </section> : null}
           </main>
         </SignedIn>
       ) : null}
