@@ -1242,11 +1242,6 @@ export default function App() {
           <button type="button" onClick={() => scrollToSection("contacto")}>
             Contacto
           </button>
-          {isAdminUser ? (
-            <button type="button" onClick={() => setActiveView("admin")}>
-              Admin
-            </button>
-          ) : null}
         </nav>
 
         <div className="store-header__actions">
