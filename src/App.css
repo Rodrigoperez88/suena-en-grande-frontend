@@ -9,7 +9,8 @@
   animation: page-gradient 15s ease infinite;
   font-family: Georgia, "Times New Roman", serif;
   --soft-buddha-bg:
-    linear-gradient(rgba(255, 250, 245, 0.9), rgba(255, 248, 241, 0.9)),
+    linear-gradient(rgba(255, 247, 239, 0.7), rgba(251, 240, 230, 0.72)),
+    linear-gradient(rgba(163, 112, 74, 0.12), rgba(163, 112, 74, 0.12)),
     url("https://res.cloudinary.com/dfetskjy0/image/upload/v1777154447/budi2_zc941i.png");
 }
 
@@ -621,6 +622,7 @@ img {
   background: var(--soft-buddha-bg);
   background-size: cover;
   background-position: center;
+  background-blend-mode: screen, multiply, normal;
   border: 1px solid rgba(106, 70, 47, 0.13);
   box-shadow: 0 18px 48px rgba(83, 48, 30, 0.07);
   backdrop-filter: blur(8px);
@@ -895,6 +897,7 @@ img {
   background: var(--soft-buddha-bg);
   background-size: cover;
   background-position: center;
+  background-blend-mode: screen, multiply, normal;
 }
 
 .store-benefits article {
@@ -902,7 +905,7 @@ img {
   border: 0;
   border-right: 1px solid rgba(106, 70, 47, 0.12);
   border-radius: 0;
-  background: rgba(255, 252, 248, 0.76);
+  background: rgba(255, 252, 248, 0.58);
 }
 
 .store-benefits article:last-child {
