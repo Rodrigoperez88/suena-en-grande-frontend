@@ -2252,7 +2252,8 @@ export default function App() {
               ) : null}
             </div> : null}
 
-            {adminCatalogSection === "products" ? <div className="panel" id="adminProductForm">
+            {adminCatalogSection === "products" ? <div className="admin-products-workspace">
+            <div className="panel admin-products-workspace__panel" id="adminProductForm">
               <div className="panel__header">
                 <div>
                   <p className="eyebrow">Catalogo</p>
@@ -2446,9 +2447,9 @@ export default function App() {
                     ? "Actualizar producto"
                     : "Crear producto"}
               </button>
-            </div> : null}
+            </div>
 
-            {adminCatalogSection === "products" ? <div className="panel">
+            <div className="panel admin-products-workspace__panel">
               <div className="panel__header">
                 <div>
                   <p className="eyebrow">Stock actual</p>
@@ -2548,6 +2549,7 @@ export default function App() {
                   })
                 )}
               </div>
+            </div>
             </div> : null}
           </section> : null}
           </main>

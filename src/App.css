@@ -565,6 +565,34 @@ img {
   grid-column: 1 / -1;
 }
 
+.admin-products-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 22px;
+  grid-column: 1 / -1;
+  align-items: start;
+}
+
+.admin-products-workspace__panel {
+  min-height: 860px;
+  max-height: 860px;
+  overflow-y: auto;
+}
+
+.admin-products-workspace__panel::-webkit-scrollbar {
+  width: 10px;
+}
+
+.admin-products-workspace__panel::-webkit-scrollbar-thumb {
+  background: rgba(106, 70, 47, 0.22);
+  border-radius: 999px;
+}
+
+.admin-products-workspace__panel::-webkit-scrollbar-track {
+  background: rgba(106, 70, 47, 0.05);
+  border-radius: 999px;
+}
+
 .admin-side {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2150,6 +2178,16 @@ img {
     width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .admin-products-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-products-workspace__panel {
+    min-height: auto;
+    max-height: none;
+    overflow: visible;
   }
 
   .form-grid {
