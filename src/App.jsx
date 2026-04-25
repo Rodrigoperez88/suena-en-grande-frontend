@@ -1203,6 +1203,10 @@ export default function App() {
   const categorySections = Object.entries(productsByCategory).filter(([category]) => {
     return selectedCategory === "todos" || category === selectedCategory;
   });
+  const visibleProducts =
+    selectedCategory === "todos"
+      ? products
+      : products.filter((product) => (product.category?.trim() || "Sin categoria") === selectedCategory);
 
   return (
     <div className="page-shell">
@@ -1455,6 +1459,72 @@ export default function App() {
               <div className="empty-state">
                 <h3>Todavia no hay productos cargados</h3>
                 <p>Usa el panel admin para crear el catalogo inicial.</p>
+              </div>
+            ) : selectedCategory === "todos" ? (
+              <div className="catalog-grid-view">
+                <div className="catalog-grid-view__header">
+                  <div>
+                    <p className="eyebrow eyebrow--compact">Catalogo completo</p>
+                    <h3>Todos los productos</h3>
+                  </div>
+                  <span>{visibleProducts.length} productos</span>
+                </div>
+
+                <div className="product-grid product-grid--catalog">
+                  {visibleProducts.map((product) => {
+                    const cartItem = cart.find((item) => item.id === product.id);
+                    const remainingStock = product.stock - (cartItem?.quantity || 0);
+                    const hasStock = remainingStock > 0;
+
+                    return (
+                      <article className="product-card" key={product.id}>
+                        <div className="product-card__media">
+                          <span className="product-card__badge">
+                            {hasStock ? "Envio coordinado" : "Sin stock"}
+                          </span>
+                          {product.image ? (
+                            <img src={product.image} alt={product.name} />
+                          ) : (
+                            <span>{product.category || "Producto"}</span>
+                          )}
+                        </div>
+
+                        <div className="product-card__body">
+                          <p className="eyebrow eyebrow--compact">
+                            {product.category || "Sin categoria"}
+                          </p>
+                          <h3>{product.name}</h3>
+                          <p className="product-card__description">
+                            {product.description ||
+                              "Producto ideal para sumar aroma, armonia y calidez al hogar."}
+                          </p>
+
+                          <div className="product-card__meta">
+                            <strong>{formatPrice(product.price)}</strong>
+                            <span
+                              className={
+                                hasStock
+                                  ? "stock-pill stock-pill--available"
+                                  : "stock-pill stock-pill--empty"
+                              }
+                            >
+                              {hasStock ? "En stock" : "Sin stock"}
+                            </span>
+                          </div>
+
+                          <button
+                            type="button"
+                            className="primary-btn"
+                            onClick={() => addToCart(product)}
+                            disabled={!hasStock}
+                          >
+                            {hasStock ? "Agregar al carrito" : "Sin stock"}
+                          </button>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
               </div>
             ) : (
               <div className="category-sections">
