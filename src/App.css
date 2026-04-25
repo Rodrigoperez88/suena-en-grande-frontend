@@ -1285,6 +1285,28 @@ img {
   padding: 16px;
 }
 
+.admin-products {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  max-height: 720px;
+  overflow-y: auto;
+  padding-right: 6px;
+  align-content: start;
+}
+
+.admin-products::-webkit-scrollbar {
+  width: 10px;
+}
+
+.admin-products::-webkit-scrollbar-thumb {
+  background: rgba(106, 70, 47, 0.22);
+  border-radius: 999px;
+}
+
+.admin-products::-webkit-scrollbar-track {
+  background: rgba(106, 70, 47, 0.05);
+  border-radius: 999px;
+}
+
 .metric-card {
   background: #fff;
 }
@@ -1327,6 +1349,19 @@ img {
   justify-content: space-between;
   gap: 12px;
   align-items: center;
+}
+
+.admin-product-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: start;
+  border-radius: 22px;
+  background:
+    linear-gradient(rgba(255, 250, 245, 0.78), rgba(255, 248, 243, 0.78)),
+    url("https://res.cloudinary.com/dfetskjy0/image/upload/v1777154447/budi2_zc941i.png");
+  background-size: cover;
+  background-position: center;
 }
 
 .qty-control {
@@ -1505,6 +1540,13 @@ img {
 
 .admin-product-card__main {
   justify-content: flex-start;
+  align-items: start;
+}
+
+.admin-product-card__main > div:last-child {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
 }
 
 .admin-product-card__thumb {
@@ -1533,6 +1575,16 @@ img {
   color: #8a6046;
   font-size: 1.2rem;
   font-weight: 700;
+}
+
+.admin-product-card__actions {
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 112px;
+}
+
+.admin-product-card__actions button {
+  width: 100%;
 }
 
 .admin-product-flags {
@@ -2130,6 +2182,13 @@ img {
   .admin-product-card__thumb {
     width: 58px;
     height: 58px;
+  }
+
+  .admin-products {
+    grid-template-columns: 1fr;
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
   }
 
   .admin-product-card {
