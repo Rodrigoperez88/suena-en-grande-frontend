@@ -96,6 +96,7 @@ export default function App() {
   const [orderStatusFilter, setOrderStatusFilter] = useState("todos");
   const [orderSearch, setOrderSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("todos");
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [adminProductSearch, setAdminProductSearch] = useState("");
   const [adminProductCategoryFilter, setAdminProductCategoryFilter] = useState("todas");
 
@@ -308,6 +309,28 @@ export default function App() {
 
     void loadInitialAdminView();
   }, [activeView, apiUrl, getAdminRequestConfig, isAdminUser, isAuthLoaded]);
+
+  useEffect(() => {
+    if (!selectedProduct) {
+      document.body.style.overflow = "";
+      return undefined;
+    }
+
+    document.body.style.overflow = "hidden";
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setSelectedProduct(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [selectedProduct]);
 
   const cartTotalQuantity = useMemo(() => {
     return cart.reduce((acc, item) => acc + item.quantity, 0);
@@ -1207,6 +1230,64 @@ export default function App() {
     selectedCategory === "todos"
       ? products
       : products.filter((product) => (product.category?.trim() || "Sin categoria") === selectedCategory);
+  const renderStoreProductCard = (product) => {
+    const cartItem = cart.find((item) => item.id === product.id);
+    const remainingStock = product.stock - (cartItem?.quantity || 0);
+    const hasStock = remainingStock > 0;
+
+    return (
+      <article className="product-card" key={product.id}>
+        <button
+          type="button"
+          className="product-card__media product-card__media-btn"
+          onClick={() => setSelectedProduct(product)}
+          aria-label={`Ver detalle de ${product.name}`}
+        >
+          <span className="product-card__badge">{hasStock ? "Envio coordinado" : "Sin stock"}</span>
+          {product.image ? (
+            <img src={product.image} alt={product.name} />
+          ) : (
+            <span>{product.category || "Producto"}</span>
+          )}
+        </button>
+
+        <div className="product-card__body">
+          <p className="eyebrow eyebrow--compact">{product.category || "Sin categoria"}</p>
+          <h3>{product.name}</h3>
+          <p className="product-card__description">
+            {product.description || "Producto ideal para sumar aroma, armonia y calidez al hogar."}
+          </p>
+
+          <div className="product-card__meta">
+            <strong>{formatPrice(product.price)}</strong>
+            <span
+              className={hasStock ? "stock-pill stock-pill--available" : "stock-pill stock-pill--empty"}
+            >
+              {hasStock ? "En stock" : "Sin stock"}
+            </span>
+          </div>
+
+          <div className="product-card__actions">
+            <button
+              type="button"
+              className="secondary-btn"
+              onClick={() => setSelectedProduct(product)}
+            >
+              Ver detalle
+            </button>
+            <button
+              type="button"
+              className="primary-btn"
+              onClick={() => addToCart(product)}
+              disabled={!hasStock}
+            >
+              {hasStock ? "Agregar al carrito" : "Sin stock"}
+            </button>
+          </div>
+        </div>
+      </article>
+    );
+  };
 
   return (
     <div className="page-shell">
@@ -1471,59 +1552,7 @@ export default function App() {
                 </div>
 
                 <div className="product-grid product-grid--catalog">
-                  {visibleProducts.map((product) => {
-                    const cartItem = cart.find((item) => item.id === product.id);
-                    const remainingStock = product.stock - (cartItem?.quantity || 0);
-                    const hasStock = remainingStock > 0;
-
-                    return (
-                      <article className="product-card" key={product.id}>
-                        <div className="product-card__media">
-                          <span className="product-card__badge">
-                            {hasStock ? "Envio coordinado" : "Sin stock"}
-                          </span>
-                          {product.image ? (
-                            <img src={product.image} alt={product.name} />
-                          ) : (
-                            <span>{product.category || "Producto"}</span>
-                          )}
-                        </div>
-
-                        <div className="product-card__body">
-                          <p className="eyebrow eyebrow--compact">
-                            {product.category || "Sin categoria"}
-                          </p>
-                          <h3>{product.name}</h3>
-                          <p className="product-card__description">
-                            {product.description ||
-                              "Producto ideal para sumar aroma, armonia y calidez al hogar."}
-                          </p>
-
-                          <div className="product-card__meta">
-                            <strong>{formatPrice(product.price)}</strong>
-                            <span
-                              className={
-                                hasStock
-                                  ? "stock-pill stock-pill--available"
-                                  : "stock-pill stock-pill--empty"
-                              }
-                            >
-                              {hasStock ? "En stock" : "Sin stock"}
-                            </span>
-                          </div>
-
-                          <button
-                            type="button"
-                            className="primary-btn"
-                            onClick={() => addToCart(product)}
-                            disabled={!hasStock}
-                          >
-                            {hasStock ? "Agregar al carrito" : "Sin stock"}
-                          </button>
-                        </div>
-                      </article>
-                    );
-                  })}
+                  {visibleProducts.map(renderStoreProductCard)}
                 </div>
               </div>
             ) : (
@@ -1539,59 +1568,7 @@ export default function App() {
                     </div>
 
                     <div className="product-grid">
-                      {categoryProducts.map((product) => {
-                        const cartItem = cart.find((item) => item.id === product.id);
-                        const remainingStock = product.stock - (cartItem?.quantity || 0);
-                        const hasStock = remainingStock > 0;
-
-                        return (
-                          <article className="product-card" key={product.id}>
-                            <div className="product-card__media">
-                              <span className="product-card__badge">
-                                {hasStock ? "Envio coordinado" : "Sin stock"}
-                              </span>
-                              {product.image ? (
-                                <img src={product.image} alt={product.name} />
-                              ) : (
-                                <span>{product.category || "Producto"}</span>
-                              )}
-                            </div>
-
-                            <div className="product-card__body">
-                              <p className="eyebrow eyebrow--compact">
-                                {product.category || "Sin categoria"}
-                              </p>
-                              <h3>{product.name}</h3>
-                              <p className="product-card__description">
-                                {product.description ||
-                                  "Producto ideal para sumar aroma, armonia y calidez al hogar."}
-                              </p>
-
-                              <div className="product-card__meta">
-                                <strong>{formatPrice(product.price)}</strong>
-                                <span
-                                  className={
-                                    hasStock
-                                      ? "stock-pill stock-pill--available"
-                                      : "stock-pill stock-pill--empty"
-                                  }
-                                >
-                                  {hasStock ? "En stock" : "Sin stock"}
-                                </span>
-                              </div>
-
-                              <button
-                                type="button"
-                                className="primary-btn"
-                                onClick={() => addToCart(product)}
-                                disabled={!hasStock}
-                              >
-                                {hasStock ? "Agregar al carrito" : "Sin stock"}
-                              </button>
-                            </div>
-                          </article>
-                        );
-                      })}
+                      {categoryProducts.map(renderStoreProductCard)}
                     </div>
                   </section>
                 ))}
@@ -2529,6 +2506,82 @@ export default function App() {
           </section>
           </main>
         </SignedIn>
+      ) : null}
+
+      {selectedProduct ? (
+        <div
+          className="product-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="productModalTitle"
+          onClick={() => setSelectedProduct(null)}
+        >
+          <div className="product-modal__card" onClick={(event) => event.stopPropagation()}>
+            <button
+              type="button"
+              className="product-modal__close"
+              onClick={() => setSelectedProduct(null)}
+              aria-label="Cerrar detalle del producto"
+            >
+              ×
+            </button>
+
+            <div className="product-modal__media">
+              {selectedProduct.image ? (
+                <img src={selectedProduct.image} alt={selectedProduct.name} />
+              ) : (
+                <div className="product-modal__fallback">
+                  <span>{selectedProduct.category || "Producto"}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="product-modal__body">
+              <p className="eyebrow eyebrow--compact">
+                {selectedProduct.category || "Sin categoria"}
+              </p>
+              <h3 id="productModalTitle">{selectedProduct.name}</h3>
+              <p>
+                {selectedProduct.description ||
+                  "Producto ideal para sumar aroma, armonia y calidez al hogar."}
+              </p>
+
+              <div className="product-modal__meta">
+                <strong>{formatPrice(selectedProduct.price)}</strong>
+                <span
+                  className={
+                    getAvailableStock(selectedProduct.id) > 0
+                      ? "stock-pill stock-pill--available"
+                      : "stock-pill stock-pill--empty"
+                  }
+                >
+                  {getAvailableStock(selectedProduct.id) > 0 ? "En stock" : "Sin stock"}
+                </span>
+              </div>
+
+              <div className="product-modal__actions">
+                <button
+                  type="button"
+                  className="secondary-btn"
+                  onClick={() => setSelectedProduct(null)}
+                >
+                  Seguir viendo
+                </button>
+                <button
+                  type="button"
+                  className="primary-btn"
+                  onClick={() => {
+                    addToCart(selectedProduct);
+                    setSelectedProduct(null);
+                  }}
+                  disabled={getAvailableStock(selectedProduct.id) <= 0}
+                >
+                  {getAvailableStock(selectedProduct.id) > 0 ? "Agregar al carrito" : "Sin stock"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       ) : null}
 
       <footer className="site-footer">

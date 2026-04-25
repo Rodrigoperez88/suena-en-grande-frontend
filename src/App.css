@@ -833,6 +833,14 @@ img {
   transform: scale(1.04);
 }
 
+.product-card__media-btn {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
 .product-card__body {
   display: grid;
   gap: 10px;
@@ -861,6 +869,113 @@ img {
 .summary-row--total strong,
 .order-card__status span {
   font-size: 1.18rem;
+}
+
+.product-card__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.product-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(38, 24, 18, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+.product-modal__card {
+  position: relative;
+  width: min(920px, 100%);
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(280px, 0.92fr);
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid rgba(106, 70, 47, 0.14);
+  background:
+    linear-gradient(rgba(255, 249, 243, 0.88), rgba(255, 248, 241, 0.88)),
+    url("https://res.cloudinary.com/dfetskjy0/image/upload/v1777154447/budi2_zc941i.png");
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 32px 90px rgba(38, 24, 18, 0.22);
+}
+
+.product-modal__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 249, 243, 0.92);
+  color: #3a261c;
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+.product-modal__media {
+  min-height: 340px;
+  background: rgba(237, 218, 198, 0.42);
+}
+
+.product-modal__media img {
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-modal__fallback {
+  display: grid;
+  height: 100%;
+  place-items: center;
+  color: #7b563e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.product-modal__body {
+  display: grid;
+  align-content: center;
+  gap: 14px;
+  padding: 36px 32px;
+}
+
+.product-modal__body h3 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 3vw, 2.8rem);
+}
+
+.product-modal__body p {
+  margin: 0;
+  color: #6c5649;
+  line-height: 1.65;
+}
+
+.product-modal__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.product-modal__meta strong {
+  font-size: 1.6rem;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.product-modal__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
 .stock-pill {
@@ -1792,6 +1907,9 @@ img {
   .catalog-grid-view__header,
   .category-section__header,
   .product-card__meta,
+  .product-card__actions,
+  .product-modal__meta,
+  .product-modal__actions,
   .cart-item__controls,
   .admin-product-card__main,
   .order-card__top,
@@ -1836,6 +1954,24 @@ img {
 
   .hero__aside {
     min-width: 0;
+  }
+
+  .product-modal {
+    padding: 14px;
+  }
+
+  .product-modal__card {
+    grid-template-columns: 1fr;
+    max-height: calc(100vh - 28px);
+    overflow-y: auto;
+  }
+
+  .product-modal__media {
+    min-height: 240px;
+  }
+
+  .product-modal__body {
+    padding: 20px 18px 18px;
   }
 
   .panel__hint {
