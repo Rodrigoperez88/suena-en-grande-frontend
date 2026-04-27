@@ -259,12 +259,13 @@ img {
   z-index: 0;
   border-radius: inherit;
   background-image:
-    linear-gradient(rgba(34, 22, 16, 0.26), rgba(34, 22, 16, 0.18)),
-    url("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnhic2R6YnF6amZ4bmZ4bmZ4bmZ4bmZ4bmZ4bmZ4bmZ4bmZ4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKMGpxxcaOQI6U8/giphy.gif");
+    radial-gradient(circle at 18% 24%, rgba(255, 246, 236, 0.46), transparent 26%),
+    radial-gradient(circle at 78% 32%, rgba(221, 183, 152, 0.22), transparent 28%),
+    radial-gradient(circle at 62% 80%, rgba(184, 129, 91, 0.16), transparent 24%),
+    linear-gradient(rgba(255, 247, 239, 0.18), rgba(234, 212, 193, 0.22));
   background-position: center;
   background-size: cover;
-  opacity: 0.16;
-  filter: saturate(0.72) sepia(0.12);
+  opacity: 0.9;
 }
 
 .hero::after {
