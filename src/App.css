@@ -121,6 +121,7 @@ img {
   position: sticky;
   top: 0;
   z-index: 4;
+  isolation: isolate;
   display: grid;
   grid-template-columns: minmax(210px, 0.7fr) minmax(280px, 1fr) auto;
   align-items: center;
@@ -133,12 +134,31 @@ img {
   backdrop-filter: blur(14px);
 }
 
+.store-header::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  z-index: 0;
+  width: 280px;
+  height: 52px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: url("/budis-en-fila.webp") center / contain no-repeat;
+  opacity: 0.24;
+  filter: sepia(0.18) saturate(0.82);
+}
+
 .store-header__brand {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
 }
 
 .store-header__nav {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: center;
   gap: 8px;
@@ -153,6 +173,8 @@ img {
 }
 
 .store-header__actions {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -1895,6 +1917,13 @@ img {
     grid-template-columns: 1fr;
   }
 
+  .store-header::after {
+    width: 220px;
+    height: 42px;
+    bottom: 10px;
+    opacity: 0.18;
+  }
+
   .store-header__nav,
   .store-header__actions {
     justify-content: flex-start;
@@ -1980,6 +2009,10 @@ img {
     margin: 0 -14px 16px;
     padding: 14px;
     gap: 10px;
+  }
+
+  .store-header::after {
+    display: none;
   }
 
   .brand-login--header {
