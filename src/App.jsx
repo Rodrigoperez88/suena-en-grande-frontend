@@ -70,6 +70,7 @@ export default function App() {
     notes: "",
   });
   const [checkoutErrors, setCheckoutErrors] = useState({});
+  const [checkoutTouched, setCheckoutTouched] = useState({});
   const [submittingOrder, setSubmittingOrder] = useState(false);
   const [orderMessage, setOrderMessage] = useState("");
   const [orderError, setOrderError] = useState("");
@@ -469,6 +470,7 @@ export default function App() {
       notes: "",
     });
     setCheckoutErrors({});
+    setCheckoutTouched({});
   };
 
   const getAvailableStock = (productId) => {
@@ -531,9 +533,56 @@ export default function App() {
     setCart((prev) => prev.filter((item) => item.id !== productId));
   };
 
+  const validateCheckoutField = (field, draftCheckout = checkout) => {
+    if (field === "customerName") {
+      if (!draftCheckout.customerName.trim()) {
+        return "Contanos tu nombre para identificar el pedido.";
+      }
+
+      if (draftCheckout.customerName.trim().length < 2) {
+        return "Escribe al menos 2 letras.";
+      }
+    }
+
+    if (field === "customerPhone") {
+      const phoneDigits = draftCheckout.customerPhone.replace(/\D/g, "");
+
+      if (!phoneDigits) {
+        return "Dejanos un telefono para poder confirmarte el pedido.";
+      }
+
+      if (phoneDigits.length < 8) {
+        return "Revisa el telefono: parece demasiado corto.";
+      }
+    }
+
+    if (field === "address" && draftCheckout.deliveryMethod === "envio" && !draftCheckout.address.trim()) {
+      return "La direccion es necesaria si elegis envio.";
+    }
+
+    return "";
+  };
+
+  const touchCheckoutField = (field) => {
+    setCheckoutTouched((prev) => ({ ...prev, [field]: true }));
+    setCheckoutErrors((prev) => ({
+      ...prev,
+      [field]: validateCheckoutField(field),
+    }));
+  };
+
   const updateCheckoutField = (field, value) => {
-    setCheckout((prev) => ({ ...prev, [field]: value }));
-    setCheckoutErrors((prev) => ({ ...prev, [field]: "" }));
+    setCheckout((prev) => {
+      const nextCheckout = { ...prev, [field]: value };
+
+      setCheckoutErrors((currentErrors) => ({
+        ...currentErrors,
+        [field]: checkoutTouched[field] ? validateCheckoutField(field, nextCheckout) : "",
+        ...(field === "deliveryMethod" ? { address: checkoutTouched.address ? validateCheckoutField("address", nextCheckout) : "" } : {}),
+      }));
+
+      return nextCheckout;
+    });
     setOrderError("");
     setOrderMessage("");
     setLastOrderId(null);
@@ -543,25 +592,25 @@ export default function App() {
 
   const validateCheckout = () => {
     const nextErrors = {};
+    const requiredFields = ["customerName", "customerPhone", "address"];
 
-    if (!checkout.customerName.trim()) {
-      nextErrors.customerName = "Ingresa tu nombre.";
-    }
-
-    const phoneDigits = checkout.customerPhone.replace(/\D/g, "");
-    if (phoneDigits.length < 8) {
-      nextErrors.customerPhone = "Ingresa un telefono valido.";
-    }
-
-    if (checkout.deliveryMethod === "envio" && !checkout.address.trim()) {
-      nextErrors.address = "La direccion es obligatoria para envios.";
-    }
+    requiredFields.forEach((field) => {
+      const message = validateCheckoutField(field);
+      if (message) {
+        nextErrors[field] = message;
+      }
+    });
 
     if (cart.length === 0) {
       nextErrors.cart = "Agrega al menos un producto al carrito.";
     }
 
     setCheckoutErrors(nextErrors);
+    setCheckoutTouched({
+      customerName: true,
+      customerPhone: true,
+      address: true,
+    });
     return Object.keys(nextErrors).length === 0;
   };
 
@@ -1685,31 +1734,55 @@ export default function App() {
                 <p>Te contactamos por WhatsApp para confirmar retiro o envio.</p>
               </div>
 
-              <div className="field-group">
+              <div
+                className={
+                  checkoutTouched.customerName && checkoutErrors.customerName
+                    ? "field-group field-group--invalid"
+                    : checkoutTouched.customerName && !checkoutErrors.customerName && checkout.customerName.trim()
+                      ? "field-group field-group--valid"
+                      : "field-group"
+                }
+              >
                 <label htmlFor="customerName">Nombre</label>
                 <input
                   id="customerName"
                   type="text"
                   value={checkout.customerName}
                   onChange={(event) => updateCheckoutField("customerName", event.target.value)}
+                  onBlur={() => touchCheckoutField("customerName")}
                   placeholder="Como te llamas"
+                  aria-invalid={Boolean(checkoutTouched.customerName && checkoutErrors.customerName)}
                 />
-                {checkoutErrors.customerName ? (
+                {checkoutTouched.customerName && checkoutErrors.customerName ? (
                   <p className="field-error">{checkoutErrors.customerName}</p>
+                ) : checkoutTouched.customerName && checkout.customerName.trim() ? (
+                  <p className="field-status">Perfecto, ya sabemos a nombre de quien va el pedido.</p>
                 ) : null}
               </div>
 
-              <div className="field-group">
+              <div
+                className={
+                  checkoutTouched.customerPhone && checkoutErrors.customerPhone
+                    ? "field-group field-group--invalid"
+                    : checkoutTouched.customerPhone && !checkoutErrors.customerPhone && checkout.customerPhone.trim()
+                      ? "field-group field-group--valid"
+                      : "field-group"
+                }
+              >
                 <label htmlFor="customerPhone">Telefono</label>
                 <input
                   id="customerPhone"
                   type="text"
                   value={checkout.customerPhone}
                   onChange={(event) => updateCheckoutField("customerPhone", event.target.value)}
+                  onBlur={() => touchCheckoutField("customerPhone")}
                   placeholder="Tu contacto"
+                  aria-invalid={Boolean(checkoutTouched.customerPhone && checkoutErrors.customerPhone)}
                 />
-                {checkoutErrors.customerPhone ? (
+                {checkoutTouched.customerPhone && checkoutErrors.customerPhone ? (
                   <p className="field-error">{checkoutErrors.customerPhone}</p>
+                ) : checkoutTouched.customerPhone && checkout.customerPhone.trim() ? (
+                  <p className="field-status">Genial, te escribimos a este numero para coordinar.</p>
                 ) : null}
               </div>
 
@@ -1725,7 +1798,15 @@ export default function App() {
                 </select>
               </div>
 
-              <div className="field-group">
+              <div
+                className={
+                  checkoutTouched.address && checkoutErrors.address
+                    ? "field-group field-group--invalid"
+                    : checkoutTouched.address && !checkoutErrors.address && checkout.address.trim()
+                      ? "field-group field-group--valid"
+                      : "field-group"
+                }
+              >
                 <label htmlFor="address">
                   Direccion {checkout.deliveryMethod === "envio" ? "(obligatoria)" : "(opcional)"}
                 </label>
@@ -1734,10 +1815,14 @@ export default function App() {
                   type="text"
                   value={checkout.address}
                   onChange={(event) => updateCheckoutField("address", event.target.value)}
+                  onBlur={() => touchCheckoutField("address")}
                   placeholder="Calle, altura y referencia"
+                  aria-invalid={Boolean(checkoutTouched.address && checkoutErrors.address)}
                 />
-                {checkoutErrors.address ? (
+                {checkoutTouched.address && checkoutErrors.address ? (
                   <p className="field-error">{checkoutErrors.address}</p>
+                ) : checkoutTouched.address && checkout.address.trim() ? (
+                  <p className="field-status">Buenisimo, ya tenemos el punto de entrega.</p>
                 ) : null}
               </div>
 
@@ -1752,7 +1837,7 @@ export default function App() {
                 />
               </div>
 
-              {checkoutErrors.cart ? <p className="field-error">{checkoutErrors.cart}</p> : null}
+              {checkoutErrors.cart ? <p className="field-error field-error--banner">{checkoutErrors.cart}</p> : null}
               {orderError ? <p className="feedback feedback--error">{orderError}</p> : null}
               {orderMessage ? <p className="feedback feedback--success">{orderMessage}</p> : null}
 
