@@ -137,16 +137,14 @@ img {
 .store-header::after {
   content: "";
   position: absolute;
-  left: 50%;
-  bottom: 8px;
+  inset: 0;
   z-index: 0;
-  width: 280px;
-  height: 52px;
-  transform: translateX(-50%);
   pointer-events: none;
-  background: url("/budis-en-fila.webp") center / contain no-repeat;
-  opacity: 0.24;
-  filter: sepia(0.18) saturate(0.82);
+  background:
+    linear-gradient(rgba(255, 248, 240, 0.7), rgba(255, 248, 240, 0.7)),
+    url("/budis-en-fila.webp") center / auto 62% repeat-x;
+  opacity: 0.34;
+  filter: sepia(0.14) saturate(0.9);
 }
 
 .store-header__brand {
@@ -1918,10 +1916,8 @@ img {
   }
 
   .store-header::after {
-    width: 220px;
-    height: 42px;
-    bottom: 10px;
-    opacity: 0.18;
+    background-size: auto 46%;
+    opacity: 0.22;
   }
 
   .store-header__nav,
