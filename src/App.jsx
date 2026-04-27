@@ -72,6 +72,7 @@ export default function App() {
   const [checkoutErrors, setCheckoutErrors] = useState({});
   const [checkoutTouched, setCheckoutTouched] = useState({});
   const [submittingOrder, setSubmittingOrder] = useState(false);
+  const [submittingMercadoPago, setSubmittingMercadoPago] = useState(false);
   const [orderMessage, setOrderMessage] = useState("");
   const [orderError, setOrderError] = useState("");
   const [lastOrderId, setLastOrderId] = useState(null);
@@ -115,6 +116,9 @@ export default function App() {
     isSignedIn &&
     adminEmails.length > 0 &&
     currentUserEmails.some((email) => adminEmails.includes(email));
+  const openAdminAccess = useCallback(() => {
+    setActiveView("admin");
+  }, []);
   const adminMetrics = useMemo(() => {
     const pendingOrders = orders.filter((order) => order.status === "pendiente").length;
     const deliveredOrders = orders.filter((order) => order.status === "entregado").length;
@@ -334,6 +338,35 @@ export default function App() {
       window.removeEventListener("keydown", handleEscape);
     };
   }, [selectedProduct]);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const paymentStatus = searchParams.get("mp_status");
+
+    if (!paymentStatus) {
+      return;
+    }
+
+    if (paymentStatus === "success") {
+      setOrderMessage("Mercado Pago te devolvio a la tienda. Si el pago se acredito, ya podemos continuar la confirmacion.");
+      setOrderError("");
+    }
+
+    if (paymentStatus === "pending") {
+      setOrderMessage("Tu pago quedo pendiente de confirmacion en Mercado Pago.");
+      setOrderError("");
+    }
+
+    if (paymentStatus === "failure") {
+      setOrderError("El pago no se pudo completar en Mercado Pago. Puedes intentarlo otra vez o pedir coordinacion manual.");
+      setOrderMessage("");
+    }
+
+    searchParams.delete("mp_status");
+    const nextQuery = searchParams.toString();
+    const nextUrl = `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ""}${window.location.hash}`;
+    window.history.replaceState({}, "", nextUrl);
+  }, []);
 
   const cartTotalQuantity = useMemo(() => {
     return cart.reduce((acc, item) => acc + item.quantity, 0);
@@ -812,6 +845,53 @@ export default function App() {
       );
     } finally {
       setSavingCategory(false);
+    }
+  };
+
+  const startMercadoPagoCheckout = async () => {
+    try {
+      setOrderError("");
+      setOrderMessage("");
+
+      if (!validateCheckout()) {
+        return;
+      }
+
+      setSubmittingMercadoPago(true);
+
+      const payload = {
+        customerName: checkout.customerName.trim(),
+        customerPhone: checkout.customerPhone.trim(),
+        address: checkout.address.trim(),
+        deliveryMethod: checkout.deliveryMethod,
+        notes: checkout.notes.trim(),
+        items: cart.map((item) => ({
+          id: item.id,
+          quantity: item.quantity,
+        })),
+      };
+
+      const response = await axios.post(`${apiUrl}/pagos/mercado-pago/preferencia`, payload);
+      const redirectUrl = response.data.initPoint || response.data.sandboxInitPoint;
+
+      if (!redirectUrl) {
+        throw new Error("Mercado Pago no devolvio una URL de pago.");
+      }
+
+      window.location.href = redirectUrl;
+    } catch (err) {
+      console.error("Error al iniciar Mercado Pago:", err);
+      const details = err?.response?.data?.details;
+      setOrderError(
+        Array.isArray(details) && details.length > 0
+          ? details.join(" ")
+          : err?.response?.data?.error ||
+              err?.response?.data?.detalle ||
+              err?.message ||
+              "No se pudo iniciar el pago con Mercado Pago."
+      );
+    } finally {
+      setSubmittingMercadoPago(false);
     }
   };
 
@@ -1356,7 +1436,11 @@ export default function App() {
         <div className="store-header__brand">
           <SignedOut>
             <SignInButton mode="modal">
-              <button type="button" className="brand-login brand-login--header">
+              <button
+                type="button"
+                className="brand-login brand-login--header"
+                onClick={openAdminAccess}
+              >
                 Sueña en Grande
               </button>
             </SignInButton>
@@ -1365,7 +1449,7 @@ export default function App() {
             <button
               type="button"
               className="brand-login brand-login--header"
-              onClick={() => setActiveView("shop")}
+              onClick={openAdminAccess}
             >
               Sueña en Grande
             </button>
@@ -1848,14 +1932,24 @@ export default function App() {
                 </div>
               ) : null}
 
-              <button
-                type="button"
-                className="primary-btn primary-btn--full"
-                onClick={submitOrder}
-                disabled={submittingOrder}
-              >
-                {submittingOrder ? "Enviando pedido..." : "Confirmar pedido"}
-              </button>
+              <div className="checkout-actions">
+                <button
+                  type="button"
+                  className="primary-btn primary-btn--full"
+                  onClick={submitOrder}
+                  disabled={submittingOrder || submittingMercadoPago}
+                >
+                  {submittingOrder ? "Enviando pedido..." : "Confirmar pedido"}
+                </button>
+                <button
+                  type="button"
+                  className="secondary-btn primary-btn--full"
+                  onClick={startMercadoPagoCheckout}
+                  disabled={submittingOrder || submittingMercadoPago}
+                >
+                  {submittingMercadoPago ? "Abriendo Mercado Pago..." : "Pagar con Mercado Pago"}
+                </button>
+              </div>
             </div>
           </aside>
         </main>
